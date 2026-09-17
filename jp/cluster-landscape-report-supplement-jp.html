@@ -1,0 +1,1266 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>検索クラスター地形分析 · サプリメント</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>/* === design-tokens.css === */
+/**
+ * 디자인 시스템 - 일관된 CSS 규칙
+ * 타이포그래피, 색상, 간격, Border Radius, Border Width
+ */
+
+/* Font imports handled by globals.css */
+
+/* ========== CSS Custom Properties (Design Tokens) ========== */
+:root {
+  /* ----- Font Family ----- */
+  --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, Sans-serif;
+
+  /* ----- Typography (폰트 굵기 / 줄높이 / 크기) ----- */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+  --line-height-snug: 1.3;
+  --line-height-normal: 1.5;
+  --line-height-tight: 1.4;
+  --font-size-display: 48px;  /* Display */
+  --font-size-headline1: 32px;
+  --font-size-headline2: 28px;
+  --font-size-headline3: 24px;
+  --font-size-headline4: 20px;
+  --font-size-headline5: 18px;
+  --font-size-b1: 16px;
+  --font-size-b2: 14px;
+  --font-size-b3: 13px;
+  --font-size-b4: 12px;
+  --font-size-cap: 11px;      /* Cap */
+
+  /* ----- Brand Colors ----- */
+  --brand-coral-lightest: #FFF0F6;
+  --brand-coral-main:     #FF247A;   /* LM Coral Pink  PANTONE 2039C */
+  --brand-coral-darker:   #A81650;
+
+  --brand-magenta-lightest: #F8E6F4;
+  --brand-magenta-main:     #CD3197;  /* LM Magenta  PANTONE 3527C */
+  --brand-magenta-darker:   #821E60;
+
+  --brand-purple-lightest: #FEF9FF;
+  --brand-purple-lighter:  #F5E6FA;
+  --brand-purple-main:     #AA18CC;  /* LM Purple  PANTONE 254C */
+  --brand-purple-darker:   #7A1194;
+
+  --brand-violet-lightest: #EDE6FF;
+  --brand-violet-main:     #7F18FF;  /* LM Violet  PANTONE 2091C */
+  --brand-violet-darker:   #5A10B8;
+
+  --brand-gradient: linear-gradient(135deg, #FF247A 0%, #CD3197 100%);
+
+  /* ----- Grayscale (블루그레이) ----- */
+  --white: #FFFFFF;
+  --gray-50: #F9FAFB;
+  --gray-100: #F7F8FA;
+  --gray-200: #E3E8F2;
+  --gray-300: #D1D9E6;
+  --gray-400: #AAB4C4;
+  --gray-500: #7A8699;
+  --gray-600: #586882;
+  --gray-700: #3B4A60;
+  --gray-800: #1E2A3A;
+  --gray-900: #101828;
+  --black: #000000;
+
+  /* ----- System Colors ----- */
+  /* PayPal (DEPRECATED — 정리 Phase에서 결제 페이지 sync 후 일괄 제거) */
+  --paypal-primary: #0070ba;
+  --paypal-primary-dark: #005ea6;
+  --paypal-logo-light: #c2e0f4;
+
+  --success-light: #EDF9F6;
+  --success-main: #1ABC9C;
+  --success-dark: #148F77;
+  --error-lightest: #FFF0F6;
+  --error-lighter:  #FFF0F6;
+  --error-light:    #FFAED0;
+  --error-main:     var(--brand-coral-main);
+  --error-dark:     var(--brand-coral-darker);
+  --error-darker:   #7A0F38;
+  --warning-lighter: #FFFBE6;
+  --warning-main: #FBBD08;
+  --warning-dark: #8A6600;
+
+  /* ----- Overlay Colors (반투명 레이어용 — rgba 직접 사용 금지) ----- */
+  --overlay-dark-72: rgba(16, 24, 40, 0.72);    /* gray-900@72% — 미디어 그라디언트 */
+  --overlay-dark-0: rgba(16, 24, 40, 0);         /* gray-900@0%  — 그라디언트 끝 투명 */
+  --overlay-white-82: rgba(255, 255, 255, 0.82); /* white@82%   — 히어로 설명 텍스트 */
+  --overlay-white-25: rgba(255, 255, 255, 0.25); /* white@25%   — 미디어 카드 버튼 hover */
+  --overlay-backdrop: rgba(16, 24, 40, 0.45);    /* gray-900@45% — 모바일 사이드바 백드롭 */
+
+  /* ----- Layout Tokens (컴포넌트 치수 — 8px 그리드 외 설계 고정값) ----- */
+  --sidebar-width: 280px;
+  --sidebar-width-collapsed: 53px;
+  --process-panel-width: 320px;
+  --process-panel-width-desktop: 420px;
+  --page-header-height: 56px;
+  --wizard-tab-bar-height: 48px; /* 모바일 setup wizard 탭바 높이 */
+  /*
+   * 본문 min-height(calc(100vh − 헤더 − 아래 값))용 푸터 예약 높이(대략값).
+   * 런타임에 SiteFooter(shared/layout/SiteFooter.tsx)가 실제 offsetHeight 를 측정해 덮어씀.
+   * 아래 정적 값은 SSR / 측정 전 fallback.
+   */
+  --site-footer-reserved-height: 180px;
+  --site-footer-compact-reserved-height: 72px;
+  --settings-bar-height: calc(var(--spacing-5xl) - var(--spacing-2xs)); /* 46px */
+  --btn-height-xl: 52px;
+  --process-panel-action-bar-height: 56px;
+  --process-panel-sheet-height: 65vh;
+
+  /* ----- Spacing (8px 기반) ----- */
+  --spacing-none: 0;
+  --spacing-3xs: 1px;      /* 0.0625rem */
+  --spacing-2xs: 2px;      /* 0.125rem */
+  --spacing-xs: 4px;       /* 0.25rem */
+  --spacing-sm: 8px;       /* 0.5rem */
+  --spacing-md: 12px;      /* 0.75rem */
+  --spacing-lg: 16px;      /* 1rem */
+  --spacing-xl: 20px;      /* 1.25rem */
+  --spacing-2xl: 24px;     /* 1.5rem */
+  --spacing-3xl: 32px;     /* 2rem */
+  --spacing-4xl: 40px;     /* 2.5rem */
+  --spacing-5xl: 48px;     /* 3rem */
+  --spacing-6xl: 64px;     /* 4rem */
+  --spacing-7xl: 80px;     /* 5rem */
+  --spacing-8xl: 96px;     /* 6rem */
+  --spacing-9xl: 112px;    /* 7rem */
+
+  /* ----- Border Radius ----- */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* ----- Border Width ----- */
+  --border-none: 0;
+  --border-thin: 1px;           /* 0.0625rem */
+  --border-default: 2px;        /* 0.125rem */
+  --border-thick: 3px;          /* 0.1875rem */
+  --border-extra-thick: 4px;    /* 0.25rem */
+
+  /* ----- Transition ----- */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.35s ease;
+
+  /* ----- Z-Index Scale ----- */
+  --z-base: 1;
+  --z-header: 10;
+  --z-sidebar: 100;
+  --z-dropdown: 200;
+  --z-backdrop: 290;
+  --z-sidebar-mobile: 300; /* 모바일 오버레이 사이드바 — 백드롭(290) 위에 위치 */
+  --z-process-sheet: 310;
+  --z-modal: 500;
+  --z-modal-dropdown: 600;
+  --z-toast: 700;
+
+  /* ----- Breakpoints (media query 기준값 — CSS 변수 미지원, 숫자 그대로 사용)
+     Mobile : max-width 767px
+     Tablet : 768px ~ 1279px
+     Desktop: min-width 1280px
+  ----- */
+
+  /* ----- Shadow (Figma Shadow Scale 참조) ----- */
+  /* 중요도·계층에 맞게 적용. 색상: gray-800 기반 rgba */
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px rgba(30, 42, 58, 0.04);                                    /* 미세한 깊이감, 구분선 */
+  --shadow-sm: 0 1px 3px rgba(30, 42, 58, 0.06), 0 1px 2px rgba(30, 42, 58, 0.04);  /* 미세한 깊이감, 구분선 */
+  --shadow-md: 0 4px 6px -1px rgba(30, 42, 58, 0.08), 0 2px 4px -2px rgba(30, 42, 58, 0.05);  /* 카드, 드롭다운 */
+  --shadow-lg: 0 10px 15px -3px rgba(30, 42, 58, 0.08), 0 4px 6px -4px rgba(30, 42, 58, 0.05); /* 모달, 팝오버 */
+  --shadow-xl: 0 20px 25px -5px rgba(30, 42, 58, 0.1), 0 8px 10px -6px rgba(30, 42, 58, 0.06); /* 다이얼로그, 드로어 */
+  --shadow-2xl: 0 25px 50px -12px rgba(30, 42, 58, 0.15);                            /* 최상위 레이어 */
+}
+
+html[lang="en"] {
+  --font-family: var(--font-noto-sans, 'Noto Sans'), -apple-system, BlinkMacSystemFont, Sans-serif;
+}
+
+html[lang="ja"] {
+  --font-family: var(--font-noto-sans-jp, 'Noto Sans JP'), -apple-system, BlinkMacSystemFont, Sans-serif;
+}
+
+/* ========== Base / Reset ----- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible { outline: 2px solid var(--gray-400); outline-offset: 2px; }
+
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-b1);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--gray-900);
+  background-color: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== Border Radius Utility Classes ----- */
+.radius-none   { border-radius: var(--radius-none); }
+.radius-sm     { border-radius: var(--radius-sm); }
+.radius-md     { border-radius: var(--radius-md); }
+.radius-lg     { border-radius: var(--radius-lg); }
+.radius-xl     { border-radius: var(--radius-xl); }
+.radius-2xl    { border-radius: var(--radius-2xl); }
+.radius-full   { border-radius: var(--radius-full); }
+
+/* ========== Border Width Utility Classes ----- */
+.border-none         { border-width: var(--border-none); }
+
+
+/* ========== Color Utility Classes (배경/텍스트) ----- */
+.bg-white       { background-color: var(--white); }
+.text-disabled  { color: var(--gray-500); }
+.text-error     { color: var(--error-main); }
+
+/* ========== Global Scrollbar ========== */
+* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.is-scrolling { scrollbar-color: var(--gray-300) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: transparent; border-radius: var(--radius-sm); }
+.is-scrolling::-webkit-scrollbar-thumb { background: var(--gray-300); }
+
+/* ========== Scroll Utilities ========== */
+.scroll-y { overflow-y: auto; }
+.scroll   { overflow: auto; }
+
+
+
+/* === report-shell.css === */
+/* =====================================================================
+   report-shell.css
+   리포트 공통 레이아웃 / 툴바 / 뷰 전환 / 대시보드 / A4 뷰 / 인쇄
+   의존: design-system.css
+   6개 에이전트 공용: audience-analysis, brand-context, market-synthesis,
+                      brand-share, decision-factors, trend-analysis
+   ===================================================================== */
+
+/* ===== Main Layout ===== */
+.rpt-main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  height: 100vh; /* fallback: dvh 미지원 브라우저 */
+  height: 100dvh; /* 모바일 툴바에 하단 콘텐츠 가려지는 문제 해결 */
+  overflow: hidden;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar--collapsed ~ .rpt-main { margin-left: var(--sidebar-width-collapsed); }
+
+/* ===== Toolbar ===== */
+.rpt-toolbar {
+  position: sticky; top: 0;
+  height: 56px; z-index: 200; flex-shrink: 0;
+  background: var(--white);
+  border-bottom: var(--border-thin) solid var(--gray-200);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--spacing-2xl);
+  gap: var(--spacing-lg);
+  box-shadow: var(--shadow-xs);
+}
+.rpt-toolbar__left  { display: flex; align-items: center; gap: var(--spacing-md); min-width: 0; flex: 1; }
+.rpt-toolbar__right { display: flex; align-items: center; gap: var(--spacing-sm); flex: 1; justify-content: flex-end; }
+
+.rpt-product-badge {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  min-width: 0; flex: 1;
+  font-size: var(--font-size-b2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-900);
+}
+.rpt-product-badge__label { flex-shrink: 0; }
+.rpt-product-badge__sep { color: var(--gray-300); flex-shrink: 0; }
+.rpt-product-badge__text {
+  min-width: 0; flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-weight: var(--font-weight-regular);
+  color: var(--gray-500);
+}
+
+/* ===== View Toggle ===== */
+.view-toggle {
+  display: flex;
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-md); overflow: hidden;
+}
+.view-toggle-btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: none; background: none; cursor: pointer;
+  font-family: var(--font-family);
+  font-size: var(--font-size-b4);
+  font-weight: var(--font-weight-medium);
+  color: var(--gray-500);
+  display: flex; align-items: center; gap: 5px;
+  transition: background 0.15s, color 0.15s;
+}
+.view-toggle-btn.active { background: var(--gray-800); color: var(--white); }
+.view-toggle-btn:not(.active):hover { background: var(--gray-100); color: var(--gray-700); }
+
+/* ===== Print Button ===== */
+.rpt-print-btn {
+  display: inline-flex; align-items: center; gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: none; cursor: pointer;
+  font-family: var(--font-family);
+  font-size: var(--font-size-b3);
+  font-weight: var(--font-weight-medium);
+  color: var(--gray-600);
+  transition: background 0.15s;
+}
+.rpt-print-btn:hover { background: var(--gray-100); }
+
+/* ===== Dashboard View ===== */
+.view-dash { flex: 1; overflow-y: auto; background: var(--gray-100); position: relative; min-height: 0; }
+
+/* view-dash 안 footer: view-dash 배경(gray-100)과 일체화 */
+.view-dash .site-footer {
+  background: transparent !important;
+}
+.dash-scroll {
+  max-width: 1024px; margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-2xl) var(--spacing-7xl);
+  display: flex; flex-direction: column; gap: 0;
+}
+
+/* ===== Dashboard Cover (listeningmind-ai-design report-components.css 동일) ===== */
+.dash-cover-block { flex-shrink: 0; margin-bottom: var(--spacing-lg); }
+.dash-cover-gradient {
+  background: linear-gradient(135deg, rgb(10, 5, 16) 0%, rgb(26, 8, 48) 50%, rgb(13, 21, 40) 100%);
+  padding: 22px 28px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.dash-cover-gradient::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -30px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(170, 24, 204, 0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dash-cover-gradient::after {
+  content: "";
+  position: absolute;
+  bottom: -30px;
+  left: 35%;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(255, 36, 122, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dash-cover-eyebrow {
+  font-size: 11px; font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 6px;
+  position: relative;
+}
+.dash-cover-title    { font-size: 20px; font-weight: 700; color: white; line-height: 1.35; margin-bottom: 8px; position: relative; }
+.dash-cover-category { font-size: 13px; color: rgba(255, 255, 255, 0.55); position: relative; }
+.dash-cover-meta     { font-size: 11px; color: rgba(255, 255, 255, 0.35); margin-top: 12px; position: relative; }
+
+/* ===== Dashboard Tabs ===== */
+.dash-tabs {
+  position: sticky; top: 0; z-index: 60;
+  margin: 0 calc(-1 * var(--spacing-2xl)) var(--spacing-lg);
+  padding: 0 var(--spacing-2xl);
+  background: var(--gray-100);
+  border-bottom: var(--border-thin) solid var(--gray-200);
+  box-shadow: 0 1px 0 rgba(16,24,40,0.04);
+}
+.dash-tabs__inner { display: flex; gap: 2px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.dash-tabs__inner::-webkit-scrollbar { display: none; }
+.dash-tab {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: var(--spacing-xs);
+  padding: var(--spacing-md); border: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  background: transparent; cursor: pointer;
+  font-family: var(--font-family); font-size: var(--font-size-b3);
+  font-weight: var(--font-weight-semibold); color: var(--gray-600);
+  transition: color 0.15s, border-color 0.15s; white-space: nowrap;
+}
+.dash-tab:hover  { color: var(--gray-900); }
+.dash-tab.active { color: var(--gray-800); border-bottom-color: var(--gray-800); }
+.dash-tab-panel        { display: none; animation: mrTabIn 0.22s ease; }
+.dash-tab-panel.active { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+@keyframes mrTabIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ===== Dashboard Card ===== */
+.dash-card {
+  background: var(--white);
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs); overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+.dash-card__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: var(--border-thin) solid var(--gray-100);
+}
+.dash-card__title    { font-size: var(--font-size-b2); font-weight: var(--font-weight-bold); color: var(--gray-900); }
+.dash-card__subtitle { font-size: var(--font-size-b4); font-weight: var(--font-weight-medium); color: var(--gray-500); margin-left: var(--spacing-sm); }
+.dash-card__badge    { font-size: var(--font-size-b4); color: var(--gray-500); background: var(--gray-100); padding: 2px 8px; border-radius: var(--radius-full); font-weight: var(--font-weight-medium); }
+.dash-card__body     { padding: var(--spacing-lg) var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+/* Dashboard readability overrides */
+.view-dash .dash-scroll      { font-size: var(--font-size-b2); line-height: var(--line-height-normal); }
+.view-dash .dash-card__title { font-size: var(--font-size-b1); }
+
+/* ===== Loading / Error Overlay ===== */
+@keyframes pipeline-spin { to { transform: rotate(360deg); } }
+.pipeline-loading {
+  position: absolute; inset: 0; z-index: 100;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; font-family: inherit;
+}
+.pipeline-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--gray-200); border-top-color: var(--gray-800);
+  border-radius: 50%; animation: pipeline-spin .8s linear infinite;
+}
+.pipeline-msg       { font-size: 14px; color: var(--gray-600); text-align: center; }
+.pipeline-error-msg { font-size: 14px; color: var(--error-main); text-align: center; max-width: 400px; }
+.pipeline-error-title {
+  font-size: var(--font-size-b1);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-900);
+  text-align: center;
+  margin: 0 0 8px;
+}
+.pipeline-error-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 480px;
+  padding: 0 16px;
+}
+.pipeline-loading--error { gap: 8px; }
+.pipeline-retry-btn {
+  margin-top: 12px; padding: 8px 20px;
+  border: var(--border-thin) solid var(--gray-300); border-radius: var(--radius-md);
+  background: var(--white); cursor: pointer; font-size: 13px; font-family: inherit;
+}
+.pipeline-retry-btn:hover { background: var(--gray-100); }
+
+/* ===== A4 View ===== */
+.view-a4  { flex: 1; overflow-y: auto; background: var(--gray-200); min-height: 0; }
+.a4-scroll { padding: var(--spacing-4xl) var(--spacing-2xl) var(--spacing-7xl); }
+.rpt-page {
+  width: 794px; height: 1123px; background: var(--white);
+  box-shadow: 0 2px 16px rgba(16,24,40,0.10), 0 0 0 1px rgba(16,24,40,0.04);
+  margin: 0 auto var(--spacing-4xl); position: relative;
+  display: flex; flex-direction: column;
+}
+.rpt-page > .page-body { flex: 1; }
+.page-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 40px 12px;
+  border-bottom: var(--border-thin) solid var(--gray-200);
+}
+.page-hd__brand  { font-size: 10px; font-weight: var(--font-weight-black); color: var(--gray-800); letter-spacing: 0.08em; text-transform: uppercase; }
+.page-hd__report { font-size: 10px; color: var(--gray-400); }
+.page-hd__num    { font-size: 10px; color: var(--gray-400); }
+.page-body       { padding: 32px 40px 36px; display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+/* ===== Section Header ===== */
+.sec-hd { margin-bottom: 20px; }
+.view-a4 .sec-hd { margin-top: 48px; }
+.view-a4 .page-body > .sec-hd:first-child { margin-top: 0; }
+.sec-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sec-eyebrow__line { width: 20px; height: 2px; background: var(--gray-800); flex-shrink: 0; }
+.sec-eyebrow__text { font-size: 10px; font-weight: var(--font-weight-bold); color: var(--gray-800); text-transform: uppercase; letter-spacing: 0.12em; }
+.sec-title { font-size: 22px; font-weight: var(--font-weight-black); color: var(--gray-900); line-height: var(--line-height-snug); margin-bottom: 6px; }
+.sec-desc  { font-size: var(--font-size-b3); color: var(--gray-500); line-height: var(--line-height-normal); }
+
+/* ===== Cover ===== */
+.rpt-page--cover { height: 1123px; display: flex; flex-direction: column; }
+.cover-body {
+  background: linear-gradient(135deg, #001233 0%, var(--gray-800) 55%, var(--gray-700) 100%);
+  padding: 52px 48px 44px; flex: 1;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.cover-body::before {
+  content: ''; position: absolute;
+  top: -80px; right: -60px; width: 280px; height: 280px;
+  border-radius: 50%; background: rgba(122, 172, 246, 0.08);
+}
+.cover-lm { font-size: 11px; font-weight: var(--font-weight-black); color: var(--gray-300); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: var(--spacing-3xl); position: relative; z-index: 1; }
+.cover-type-label { font-size: var(--font-size-b3); font-weight: var(--font-weight-medium); color: rgba(255,255,255,0.5); margin-bottom: 8px; position: relative; z-index: 1; }
+.cover-title { font-size: 42px; font-weight: var(--font-weight-black); color: var(--white); line-height: 1.1; margin-bottom: 10px; position: relative; z-index: 1; }
+.cover-category { font-size: var(--font-size-b2); color: rgba(255,255,255,0.65); margin-bottom: var(--spacing-2xl); position: relative; z-index: 1; max-width: 500px; line-height: 1.7; }
+.cover-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 11px; color: rgba(255,255,255,0.45); position: relative; z-index: 1; }
+.cover-meta-sep { opacity: 0.4; }
+.cover-footer { background: rgba(16,24,40,0.35); padding: 12px 48px; display: flex; align-items: center; justify-content: space-between; }
+.cover-footer__text { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+/* A4 view shell overrides */
+.view-a4 .sec-hd   { margin-bottom: var(--spacing-md); }
+.view-a4 .dash-card { margin-bottom: var(--spacing-md); }
+
+/* A4 Prose */
+.a4-prose { font-size: var(--font-size-b2); line-height: 1.8; color: var(--gray-700); }
+.a4-prose p + p { margin-top: var(--spacing-md); }
+
+/* 모바일 전용 헤더 (데스크톱에서 숨김) */
+.rpt-mobile-header {
+  display: none;
+}
+
+/* ===== Responsive: Mobile (<768px) ===== */
+@media (max-width: 767px) {
+  .rpt-main,
+  .sidebar--collapsed ~ .rpt-main {
+    margin-left: 0;
+  }
+
+  /* 모바일 헤더 표시 */
+  .rpt-mobile-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--white);
+    border-bottom: var(--border-thin) solid var(--gray-200);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .rpt-mobile-header__title {
+    font-size: var(--font-size-b1);
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-900);
+  }
+  
+  /* 기존 툴바 숨김 */
+  .rpt-toolbar {
+    display: none !important;
+  }
+}
+
+/* ===== Responsive: Small Mobile (≤480px) ===== */
+@media (max-width: 480px) {
+  .rpt-toolbar {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .view-toggle-btn span:not(.sr-only),
+  .rpt-print-btn span:not(.sr-only) {
+    display: none;
+  }
+  
+  .view-toggle-btn svg,
+  .rpt-print-btn svg {
+    margin: 0;
+  }
+  
+  .rpt-product-badge__text {
+    font-size: var(--font-size-b4);
+  }
+}
+
+/* ===== Print ===== */
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { display: block !important; height: auto !important; overflow: visible !important; background: white !important; }
+  .sidebar, .rpt-toolbar { display: none !important; }
+  .rpt-main  { display: block !important; margin-left: 0 !important; height: auto !important; overflow: visible !important; }
+  .view-dash { display: none !important; }
+  .view-a4   { display: block !important; flex: none !important; height: auto !important; overflow: visible !important; background: white !important; }
+  .a4-scroll { padding: 0 !important; }
+  .rpt-page  { width: 210mm !important; height: auto !important; overflow: visible !important; box-shadow: none !important; margin: 0 !important; break-after: page; page-break-after: always; }
+  .rpt-page--cover { height: 297mm !important; }
+  .rpt-page:last-child { break-after: auto !important; page-break-after: auto !important; }
+  .pp-card   { break-inside: avoid; page-break-inside: avoid; }
+  .type-card { break-inside: avoid; page-break-inside: avoid; }
+  .action-card { break-inside: avoid; page-break-inside: avoid; }
+}
+
+
+/* === audience-shared.css === */
+/* =====================================================================
+   audience-shared.css
+   ListeningMind.AI audience-analysis.css 에서 .mr-summary-box* 만 발췌.
+   ReportPurposeBox 가 사용하는 공통 스타일.
+   ===================================================================== */
+
+.mr-summary-box {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--gray-100);
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+.mr-summary-box--dash { padding: 20px 24px; margin: 0; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+.mr-summary-box--insight {
+  background: var(--gray-100);
+  border: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 16px 20px;
+  margin: 0;
+}
+.mr-summary-box--insight .mr-summary-box__title { color: var(--gray-800); }
+.mr-summary-box__title {
+  font-size: var(--font-size-cap); font-weight: var(--font-weight-bold);
+  color: var(--gray-800);
+  letter-spacing: 0.08em; margin-bottom: var(--spacing-xs);
+}
+.mr-summary-box p    { font-size: var(--font-size-b3); line-height: 1.7; }
+.mr-summary-text     { font-size: 14px; line-height: 1.7; }
+.mr-summary-text--sm { font-size: 13px; line-height: 1.7; }
+
+/* A4 view 에서 mr-summary-box 의 radius 보강 (audience-analysis.css 의 .view-a4 override) */
+.view-a4 .mr-summary-box { border-radius: var(--radius-md); margin-bottom: var(--spacing-md); }
+
+
+/* === report-components.css === */
+/* =====================================================================
+   report-components.css
+   리포트 공용 컴포넌트 — 인사이트 박스 / 바 차트 / 액션 그리드
+   의존: design-system.css, report-shell.css
+   6개 에이전트 공용: audience-analysis, brand-context, market-synthesis,
+                      brand-share, decision-factors, trend-analysis
+   ===================================================================== */
+
+/* ===== Insight Box ===== */
+.insight-box { padding: var(--spacing-md) var(--spacing-lg); border-radius: var(--radius-md); margin-bottom: var(--spacing-lg); }
+.insight-box--primary { background: var(--white); border: var(--border-thin) solid var(--gray-200); }
+.insight-box__title { font-size: var(--font-size-b4); font-weight: var(--font-weight-bold); color: var(--gray-800); margin-bottom: var(--spacing-sm); }
+
+/* ===== Bar Chart ===== */
+.bar-chart { display: flex; flex-direction: column; gap: 7px; }
+.bar-row   { display: flex; align-items: center; gap: var(--spacing-sm); }
+.bar-row__label { width: 240px; font-size: var(--font-size-cap); color: var(--gray-700); flex-shrink: 0; line-height: var(--line-height-snug); display: flex; align-items: center; gap: var(--spacing-sm); }
+.bar-row__track { flex: 1; height: 20px; background: var(--gray-100); border-radius: var(--radius-sm); overflow: hidden; }
+.bar-row__fill {
+  height: 100%; border-radius: var(--radius-sm);
+  background: var(--gray-800);
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: var(--spacing-xs); min-width: var(--spacing-2xl);
+  font-size: var(--font-size-cap); font-weight: var(--font-weight-bold); color: var(--white);
+  transition: width 0.6s ease;
+}
+.bar-row__pct { font-size: var(--font-size-cap); color: var(--gray-500); width: 40px; text-align: right; flex-shrink: 0; }
+
+/* ===== Proportion Block (R2 시안 Z) ===== */
+.propblock { margin-bottom: var(--spacing-md); }
+.propblock__strip {
+  display: flex; height: 36px;
+  border-radius: var(--radius-md); overflow: hidden;
+  gap: 2px; margin-bottom: 14px;
+}
+.propblock__seg {
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--font-size-cap); font-weight: var(--font-weight-bold);
+  color: var(--white); overflow: hidden; white-space: nowrap; padding: 0 6px;
+}
+.propblock__legend {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px;
+}
+.propblock__item {
+  display: flex; align-items: flex-start; gap: 7px; min-height: 34px;
+}
+.propblock__dot {
+  width: 9px; height: 9px; border-radius: 2px;
+  flex-shrink: 0; margin-top: 3px;
+}
+.propblock__label {
+  flex: 1; font-size: var(--font-size-b4); color: var(--gray-700);
+  line-height: var(--line-height-snug);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.propblock__pct {
+  font-size: var(--font-size-b4); font-weight: var(--font-weight-bold);
+  color: var(--gray-700); white-space: nowrap; flex-shrink: 0; padding-top: 1px;
+}
+
+/* ===== Action Grid ===== */
+.action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
+.action-card { background: var(--white); border: var(--border-thin) solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; }
+.action-card__header { padding: var(--spacing-md) var(--spacing-xl); display: flex; align-items: center; gap: var(--spacing-sm); border-bottom: var(--border-thin) solid var(--gray-100); }
+.action-dot             { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.action-dot--now        { background: var(--gray-700); }
+.action-dot--future     { background: var(--brand-purple-main); }
+.action-card__title     { font-size: var(--font-size-b2); font-weight: var(--font-weight-bold); }
+.action-card__body      { padding: var(--spacing-lg) var(--spacing-xl); }
+.action-item            { margin-bottom: var(--spacing-md); }
+.action-item:last-child { margin-bottom: 0; }
+.action-item__title     { font-size: var(--font-size-b2); font-weight: var(--font-weight-medium); margin-bottom: var(--spacing-xs); }
+.action-item__desc      { font-size: var(--font-size-b3); line-height: 1.7; color: var(--gray-600); }
+.action-divider         { height: 1px; background: var(--gray-100); margin: var(--spacing-sm) 0; }
+
+/* Dashboard readability overrides */
+.view-dash .action-item__title { font-size: 14px; }
+.view-dash .action-item__desc  { font-size: 13px; }
+.view-dash .bar-row__label     { font-size: var(--font-size-b2); }
+
+/* A4 view overrides */
+.view-a4 .insight-box { margin-bottom: var(--spacing-md); }
+
+/* ===== Responsive: Mobile (≤767px) ===== */
+@media (max-width: 767px) {
+  .action-grid { grid-template-columns: 1fr; }
+  .change-grid { grid-template-columns: 1fr; }
+  .type-grid { grid-template-columns: 1fr; }
+  .br-card-grid { grid-template-columns: 1fr; }
+  .br-card__metrics { grid-template-columns: repeat(3, 1fr); }
+
+  /* bar-chart: 라벨 240px 고정 → grid 2열 (라벨+퍼센트 1행, 트랙 전체 2행) */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: var(--spacing-sm);
+    row-gap: var(--spacing-2xs);
+    align-items: center;
+  }
+  .bar-row__label { width: auto; grid-column: 1; grid-row: 1; }
+  .bar-row__pct   { width: auto; grid-column: 2; grid-row: 1; text-align: right; }
+  .bar-row__track { grid-column: 1 / -1; grid-row: 2; width: 100%; }
+
+  /* tr-card 모바일 간소화 */
+  .tr-card { padding: var(--spacing-md) var(--spacing-lg); }
+  .tr-card__header { flex-direction: column-reverse; gap: var(--spacing-2xs); }
+  .tr-card__signal { flex-direction: row; align-items: center; align-self: flex-end; gap: 0; }
+  .tr-card__signal .sig { display: none; }
+  .sig-txt { display: inline; }
+
+  /* propblock 모바일: 1열, 블록 높이 증가 */
+  .propblock__strip { height: 44px; }
+  .propblock__legend { grid-template-columns: 1fr; }
+  .propblock__item { min-height: 28px; }
+}
+
+/* ===== 데이터 부족 안내 (Report 패밀리 DATA_INSUFFICIENT) ===== */
+.pipeline-nodata {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--spacing-md); max-width: 460px; width: 100%;
+  padding: 0 var(--spacing-2xl); text-align: center;
+  margin: 0 auto var(--spacing-6xl);
+}
+.pipeline-nodata__icon {
+  width: var(--spacing-6xl); height: var(--spacing-6xl); border-radius: var(--radius-full);
+  background: var(--gray-100);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--spacing-xs);
+}
+.pipeline-nodata__title {
+  font-size: var(--font-size-headline5); font-weight: var(--font-weight-bold); color: var(--gray-900);
+  margin: 0; line-height: var(--line-height-tight);
+}
+.pipeline-nodata__desc {
+  font-size: var(--font-size-b2); color: var(--gray-500); line-height: var(--line-height-normal); margin: 0;
+}
+.pipeline-nodata__desc strong { color: var(--gray-700); font-weight: var(--font-weight-semibold); }
+.pipeline-nodata__hint {
+  background: var(--gray-50); border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-lg); padding: var(--spacing-md) var(--spacing-xl);
+  width: 100%; box-sizing: border-box; text-align: left;
+}
+.pipeline-nodata__hint-title {
+  font-size: var(--font-size-cap); font-weight: var(--font-weight-semibold); color: var(--gray-400);
+  letter-spacing: .04em; text-transform: uppercase; margin-bottom: var(--spacing-sm);
+}
+.pipeline-nodata__hint-row {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  font-size: var(--font-size-b3); margin-bottom: var(--spacing-sm);
+}
+.pipeline-nodata__hint-row:last-child { margin-bottom: 0; }
+.pipeline-nodata__badge--before {
+  padding: var(--spacing-2xs) var(--spacing-sm); border-radius: var(--radius-sm);
+  background: var(--gray-100); color: var(--gray-500);
+  font-size: var(--font-size-b4);
+}
+.pipeline-nodata__badge--after {
+  padding: var(--spacing-2xs) var(--spacing-sm); border-radius: var(--radius-sm);
+  background: var(--gray-100); color: var(--gray-800);
+  font-size: var(--font-size-b4); font-weight: var(--font-weight-semibold);
+}
+.pipeline-nodata__arrow { color: var(--gray-400); font-size: var(--font-size-b3); flex-shrink: 0; }
+.pipeline-nodata > .btn { margin-top: var(--spacing-lg); }
+
+
+/* === customer-analysis.css === */
+/*
+   customer-analysis.css
+   원본: listeningmind-ai-design/pages/agents/audience-analysis/run.html <style> 블록 (페르소나 카드)
+        + listeningmind-ai-design/styles/components/report-components.css:500-512 (.persona-card 컨테이너·번호)
+   의존: design-tokens.css (CSS 변수), audience-analysis.css (dash-* / rpt-* / cover-* 공통 레이아웃)
+
+   페르소나 카드 구조:
+     head (번호 · 이름 · 메타)
+     body × 3 (① WHO · ② KBF · ③ 종합결론 = 인사이트 + 근거 키워드)
+   세 묶음 모두 동일 클래스 .persona-card__body — 관리 일원화
+*/
+
+/* 페르소나 카드 컨테이너 — dash-card 베이스 위에 padding 분리 */
+.persona-card { padding: var(--spacing-xl); border-bottom: 1px solid var(--gray-100); }
+.persona-card:first-child { padding-top: var(--spacing-lg); }
+.persona-card:last-child { border-bottom: none; }
+
+.persona-card__head { padding: 0; border: none; }
+.persona-card__body { margin-top: var(--spacing-lg); margin-left: var(--spacing-5xl); padding-left: var(--spacing-sm); }
+/* 항목 간격은 페르소나 padding이 담당 → 컨테이너 gap 제거 */
+.persona-card .dash-card__body { gap: 0; }
+
+.persona-card__top { display: flex; gap: var(--spacing-lg); align-items: flex-start; }
+/* 카드 번호 (01, 02 ...) — 원본: report-components.css:506-508 */
+.persona-card__num { font-size: 28px; font-weight: 900; color: var(--gray-200); line-height: 1; flex-shrink: 0; min-width: 40px; text-align: right; letter-spacing: -0.02em; }
+/* 카드 헤더 메인 영역 (제목 + 메타) — 원본: report-components.css:510-512 */
+.persona-card__topmain { flex: 1; min-width: 0; }
+
+.persona-card__titlerow { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; min-height: 28px; }
+.persona-card__name { font-size: var(--font-size-b1); font-weight: 700; color: var(--gray-900); line-height: 1.35; }
+.persona-relbadge { font-size: var(--font-size-cap); font-weight: 600; color: var(--brand-magenta-darker); background: var(--brand-magenta-lightest); border-radius: var(--radius-sm); padding: 2px 7px; }
+.persona-card__meta { margin-top: var(--spacing-xs); display: flex; flex-wrap: wrap; gap: var(--spacing-xs) var(--spacing-lg); font-size: var(--font-size-b4); color: var(--gray-600); }
+.persona-card__meta b { color: var(--gray-800); font-weight: 600; }
+
+/* A4 뷰: 카드 분해 후 head 간격으로 카드 구분 */
+.view-a4 .persona-card__top { margin-top: var(--spacing-6xl); }
+
+.persona-section-desc { font-size: var(--font-size-b4); color: var(--gray-500); line-height: 1.5; margin: 0; padding: var(--spacing-md) var(--spacing-xl) 0; }
+
+/* 소제목 — 세 묶음 동일. ③ 묶음 내부 두 번째 subhead만 추가 간격 */
+.persona-subhead { font-size: var(--font-size-b4); font-weight: 700; color: var(--gray-500); margin: 0 0 var(--spacing-sm); display: flex; align-items: center; gap: var(--spacing-sm); }
+.persona-subhead__badge { font-size: 10px; font-weight: 600; color: var(--gray-500); background: var(--gray-100); border-radius: var(--radius-sm); padding: 1px 6px; letter-spacing: 0.02em; }
+.persona-insight + .persona-subhead { margin-top: var(--spacing-lg); }
+
+/* ① WHO — 박스 안에 [설명 + fields(하위 근거)] */
+.persona-who { background: var(--gray-50); border-radius: var(--radius-md); padding: var(--spacing-md) 14px; }
+.persona-who__text { font-size: var(--font-size-b4); color: var(--gray-800); line-height: 1.6; }
+.persona-fields { margin-top: var(--spacing-md); display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); }
+.persona-field { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: var(--spacing-md); }
+.persona-field__label { font-size: var(--font-size-cap); font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: var(--spacing-xs); }
+.persona-field__val { font-size: var(--font-size-b4); color: var(--gray-800); line-height: 1.5; }
+
+/* ② KBF — factor 제목 + 키워드 chip 배열 */
+.persona-kbf { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.persona-kbf__row { background: var(--gray-50); border-radius: var(--radius-md); padding: var(--spacing-md) 13px; }
+.persona-kbf__factor { font-size: var(--font-size-b3); font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs); }
+.persona-kbf__kws { display: flex; flex-wrap: wrap; gap: 5px; }
+.persona-kbf__kw { font-size: var(--font-size-cap); padding: 2px 7px; border-radius: var(--radius-sm); background: #fff; color: var(--gray-600); border: 1px solid var(--gray-200); }
+
+/* ③ 종합 결론 — insight 박스 (label + text) + 근거 키워드 chip */
+.persona-insight { border-left: 3px solid var(--brand-purple-main); background: var(--brand-purple-lightest); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: var(--spacing-md) 14px; }
+.persona-insight__label { font-size: var(--font-size-cap); font-weight: 700; color: var(--brand-purple-darker); margin-bottom: var(--spacing-xs); }
+.persona-insight__text { font-size: var(--font-size-b3); color: var(--gray-800); line-height: 1.55; }
+.persona-ev-note { font-size: var(--font-size-cap); font-weight: 400; color: var(--gray-400); margin-left: auto; }
+.persona-ev { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+.persona-ev__item { font-size: var(--font-size-cap); padding: 3px 9px; border-radius: var(--radius-sm); background: var(--gray-50); color: var(--gray-700); border: 1px solid var(--gray-200); display: inline-flex; gap: var(--spacing-sm); align-items: baseline; }
+.persona-ev__vol { font-size: 10px; color: var(--brand-purple-main); font-weight: 700; }
+
+@media (max-width: 640px) {
+  .persona-fields { grid-template-columns: 1fr; }
+  .persona-card__top { gap: var(--spacing-md); }
+  .persona-card__num { font-size: 20px; min-width: 28px; }
+  .persona-card__body { margin-left: 0; padding-left: 0; }
+}
+
+/* ───────────────────────────────────────────────
+   실행 제안 패널 — 액션 카드 (rpt-act-card)
+   원본: listeningmind-ai-design/styles/components/report-components.css:155-171
+   ─────────────────────────────────────────────── */
+.rpt-act-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.rpt-act-card { border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 13px 15px; background: #fff; }
+.rpt-act-card__title { font-size: var(--font-size-b3); font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs); display: flex; align-items: center; gap: var(--spacing-sm); }
+.rpt-act-card__body { font-size: var(--font-size-b3); color: var(--gray-700); line-height: 1.55; }
+.rpt-act-empty { color: var(--gray-400); font-size: 12px; padding: var(--spacing-md); }
+
+/* action-dot 디자인 원본 크기로 정렬 (8px) — ListeningMind.AI 기본 10px 보다 작음 */
+.rpt-act-card .action-dot { width: 8px; height: 8px; }
+/* future 도트 색상 — 디자인은 회색 (gray-400) 이지만 ListeningMind.AI 는 보라색 유지 가능
+   디자인 기준: .action-dot--future { background: var(--gray-400); } */
+.rpt-act-card .action-dot--future { background: var(--gray-400); }
+/* query-opportunity 확장: #1958 ④ 세부 인사이트 카드 (총평/실행과 구분되는 마젠타 점) */
+.rpt-act-card .action-dot--insight { background: var(--brand-magenta-main); }
+/* evidence 캡 밖 키워드 안내 칩 */
+.persona-ev__more { color: var(--gray-500); font-style: normal; }
+
+/* 그룹 검색량 뱃지 마우스오버 툴팁 — 전체 member 키워드+검색량.
+   본문은 10행 높이로 고정, 초과분은 스크롤. 우상단 X 로 닫기(JS). */
+.persona-card__volbadge { position: relative; cursor: pointer; }
+.persona-card__volbadge .volbadge-tip {
+  display: none; position: absolute; top: 100%; left: 0; z-index: 30;
+  margin-top: 6px; min-width: 240px; max-width: 360px;
+  background: #fff; border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm); box-shadow: 0 6px 20px rgba(0,0,0,.14);
+  text-align: left; cursor: default; overflow: hidden;
+}
+/* 목록은 클릭으로 연다(tip-open). 마우스오버 시엔 native title 힌트만 뜬다. */
+.persona-card__volbadge.tip-open .volbadge-tip { display: block; }
+.volbadge-tip__head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--gray-100);
+  position: sticky; top: 0; background: #fff;
+}
+.volbadge-tip__title { font-size: 11px; font-weight: 700; color: var(--gray-900); }
+.volbadge-tip__close {
+  border: 0; background: transparent; color: var(--gray-500);
+  font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px; border-radius: 4px;
+}
+.volbadge-tip__close:hover { color: var(--gray-900); background: var(--gray-100); }
+/* 본문: 10행 높이(행 약 22px)로 고정, 초과분 스크롤.
+   span 은 기본 inline 이라 max-height 가 안 먹으므로 block 필수. */
+.volbadge-tip__body { display: block; max-height: 220px; overflow-y: auto; padding: 4px 0; }
+.volbadge-tip__row {
+  display: flex; justify-content: space-between; gap: 16px;
+  padding: 3px 12px; font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.volbadge-tip__kw { color: var(--gray-700); }
+.volbadge-tip__vol { color: var(--brand-purple-main); font-variant-numeric: tabular-nums; }
+/* 인쇄(A4)에서는 호버가 무의미하므로 툴팁 숨김 */
+@media print { .persona-card__volbadge .volbadge-tip { display: none !important; } }
+
+
+/* === cluster-landscape.css === */
+/* cluster-landscape 전용 스타일 — design-tokens.css 변수 사용.
+   허브 키워드 요약 표(.cl-hubtable)와 From→To 흐름 섹션(.cl-flow). */
+
+.cl-section { margin-top: 16px; }
+
+/* ── 허브 키워드 요약 표 ── */
+.cl-hubtable-wrap { overflow-x: auto; }
+.cl-hubtable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.cl-hubtable th,
+.cl-hubtable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gray-200, #e5e7eb);
+  text-align: left;
+  vertical-align: top;
+}
+.cl-hubtable thead th {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-500, #6b7280);
+  background: var(--gray-50, #f9fafb);
+  white-space: nowrap;
+}
+.cl-hubtable__group { font-weight: 600; }
+.cl-hubtable__clusters {
+  color: var(--gray-500, #6b7280);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.cl-hub-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 2px 4px 2px 0;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-purple-main, #aa18cc);
+  background: rgba(170, 24, 204, 0.08);
+}
+
+/* ── From → To 흐름 ── */
+.cl-flows { display: grid; gap: 12px; }
+.cl-flow {
+  border: 1px solid var(--gray-200, #e5e7eb);
+  border-left: 3px solid var(--brand-purple-main, #aa18cc);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--white, #fff);
+}
+.cl-flow__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cl-flow__hub { font-size: 15px; font-weight: 700; }
+.cl-flow__meta { font-size: 12px; color: var(--gray-500, #6b7280); }
+.cl-flow__path {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.cl-flow__node {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-700, #374151);
+  background: var(--gray-100, #f3f4f6);
+}
+.cl-flow__arrow {
+  color: var(--brand-purple-main, #aa18cc);
+  font-weight: 700;
+}
+.cl-flow__insight {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--gray-700, #374151);
+}
+
+@media print {
+  .cl-flow { break-inside: avoid; }
+  .cl-hubtable { break-inside: auto; }
+  .cl-hubtable tr { break-inside: avoid; }
+}
+
+
+/* === overlay.css === */
+/* =====================================================================
+   overlay.css
+   스킬 전용 wrapper: 사이드바 없는 단독 HTML 환경에 맞춘 보정 +
+   뷰 토글(대시보드/A4) + 미니 툴바 + 인쇄 강제 A4 출력.
+   ===================================================================== */
+
+/* 단독 HTML — ListeningMind.AI 의 .rpt-main 사이드바 오프셋 제거.
+   페이지 전체를 채우도록 보정. */
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: var(--font-family);
+  background: var(--gray-100);
+  color: var(--gray-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 스크롤은 페이지 전체가 담당 (ListeningMind.AI 는 .rpt-main 내부 스크롤). */
+.view-dash, .view-a4 { min-height: 100vh; }
+
+/* ===== A4 page sizing (no JS paginate) =====
+   ListeningMind.AI 는 useA4Paginate 가 런타임에 .rpt-page 를 복제해 콘텐츠를 페이지
+   단위로 옮긴다. 단독 HTML 환경에선 그 훅이 없으므로 render_report.py 가
+   페르소나 카드마다 새 .rpt-page 를 emit 한다 (components.py:a4_body_page_html).
+   그래도 한 카드가 1013px 를 넘는 극단적 케이스에 대비해 본문 페이지의 고정
+   높이를 풀고 min-height 만 유지한다. cover 페이지는 1123px 고정. */
+.view-a4 .rpt-page:not(.rpt-page--cover) {
+  height: auto;
+  min-height: 1123px;
+}
+.view-a4 .page-body > * { break-inside: avoid; page-break-inside: avoid; }
+
+/* ===== View Toggle ===== */
+body.view-mode-dash .view-a4   { display: none; }
+body.view-mode-a4   .view-dash { display: none; }
+
+/* ===== Mini Toolbar (스킬 전용 - 화면에서만 보임) ===== */
+.mini-toolbar {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 6px 8px;
+  background: var(--white);
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-family);
+}
+
+.mini-toolbar__view {
+  display: flex;
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.mini-toolbar__view button {
+  border: none;
+  background: var(--white);
+  padding: 5px 12px;
+  font-size: var(--font-size-b4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-600);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mini-toolbar__view button.active {
+  background: var(--gray-800);
+  color: var(--white);
+}
+
+.mini-toolbar__view button:not(.active):hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.mini-toolbar__print {
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  padding: 5px 12px;
+  font-size: var(--font-size-b4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-700);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.mini-toolbar__print:hover { background: var(--gray-100); }
+
+/* ===== Print Override =====
+   인쇄는 어떤 모드에 있건 A4 만 출력.
+   ListeningMind.AI 의 report-shell.css @media print 가 .view-dash 를 숨기지만
+   .view-mode-a4 일 때 .view-dash 는 이미 display:none, .view-mode-dash 일 때는
+   .view-a4 가 display:none 인 상태를 뒤집어야 한다. */
+@media print {
+  .mini-toolbar { display: none !important; }
+  body.view-mode-dash .view-dash,
+  body.view-mode-a4   .view-dash { display: none !important; }
+  body.view-mode-dash .view-a4,
+  body.view-mode-a4   .view-a4 { display: block !important; }
+
+  /* 인쇄 시에도 데스크톱 그리드 유지. 일부 브라우저는 인쇄 미리보기에서
+     뷰포트를 화면 폭으로 잡아 max-width:767px 모바일 규칙이 발동한다. */
+  .ticker-list { grid-template-columns: repeat(2, 1fr) !important; }
+  .ticker-row { flex-wrap: nowrap !important; }
+  .ticker-kw  { flex: 1 1 auto !important; font-size: var(--font-size-b3) !important; }
+  .ticker-vol { margin-left: 10px !important; }
+  .change-grid { grid-template-columns: 1fr 1fr !important; }
+  .ctx-grid    { grid-template-columns: repeat(3, 1fr) !important; }
+  .type-grid   { grid-template-columns: repeat(2, 1fr) !important; }
+  .action-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .br-card-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .persona-fields { grid-template-columns: repeat(3, 1fr) !important; }
+  .cmp-table   { min-width: auto !important; font-size: var(--font-size-b3) !important; }
+}
+
+/* ===== Force desktop layout in narrow viewports =====
+   ListeningMind.AI 의 모바일 미디어쿼리(@media max-width:767px)는 사이드바·툴바·
+   2열 그리드를 1열로 떨어뜨린다. Claude Desktop 의 내장 HTML 미리뷰는
+   뷰포트가 좁은 경우가 많아 그 규칙이 의도치 않게 작동한다. 우리 스킬은
+   "maistro 와 동일한 데스크톱 레이아웃" 을 목표로 하므로 좁은 뷰포트에서도
+   2열 그리드와 트렌드 ticker 2열을 유지하도록 강제한다. */
+@media (max-width: 767px) {
+  .ticker-list { grid-template-columns: repeat(2, 1fr) !important; }
+  .ticker-row { flex-wrap: nowrap !important; }
+  .ticker-kw  { flex: 1 1 auto !important; font-size: var(--font-size-b3) !important; }
+  .ticker-vol { margin-left: 10px !important; }
+  .change-grid { grid-template-columns: 1fr 1fr !important; }
+  .ctx-grid    { grid-template-columns: repeat(3, 1fr) !important; }
+  .type-grid   { grid-template-columns: repeat(2, 1fr) !important; }
+  .action-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .br-card-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .persona-fields { grid-template-columns: repeat(3, 1fr) !important; }
+  .cmp-table   { min-width: auto !important; font-size: var(--font-size-b3) !important; }
+}
+
+
+/* === locale font override === */
+html { --font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, Sans-serif; }</style>
+</head>
+<body class="view-mode-dash">
+
+  <div class="view-dash">
+    <div class="dash-scroll">
+      <div class="dash-cover-block"><div class="dash-card"><div class="dash-cover-gradient"><div class="dash-cover-eyebrow">検索クラスター地形分析 · 日本</div><div class="dash-cover-title">検索クラスター地形分析</div><div class="dash-cover-category">サプリメント</div><div class="dash-cover-meta">収集: 2026-09-14 · 検索目的クラスター 5</div></div><div class="mr-summary-box mr-summary-box--dash"><div class="mr-summary-box__title">背景と目的</div><p class="mr-summary-text">本レポートは「サプリメント」と一緒に検索されるキーワードが形づくる検索クラスター（同時検索の群）を分析し、日本（Google）市場にどのような検索目的の地形と探索の流れが存在するのかを把握するために作成しました。ListeningMind クラスターファインダーの同時検索グラフでキーワード群を収集し、検索数にもとづいて検索目的クラスターとハブキーワードを導き出しています。</p><p class="mr-summary-text mr-overview">サプリメント市場の検索は「何を選ぶか」と「本当に効くのか、安全なのか」という二つの軸を中心に動いており、条件別のおすすめ探しとブランドのラインナップ探索が需要の重心をつくっています。その周囲に、種類や成分の確認、飲むタイミングと継続の管理、安全性と流通経路の点検が衛星のように並び、購入前の検証構造を形づくっています。</p></div></div></div>
+      <nav class="dash-tabs" aria-label="tabs"><div class="dash-tabs__inner" role="tablist"><button type="button" class="dash-tab active" role="tab" id="dash-tab-0" aria-selected="true" data-panel="0">検索クラスター</button><button type="button" class="dash-tab" role="tab" id="dash-tab-1" aria-selected="false" data-panel="1">流れ・インサイト</button></div></nav>
+      <div class="dash-tab-panel active" role="tabpanel" aria-labelledby="dash-tab-0" data-panel="0"><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">「サプリメント」の検索目的クラスター</span><span class="dash-card__badge">5件</span></div><div class="dash-card__body"><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">01</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">種類・成分・効果の確認</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 143,586 · キーワード 106件 · クラスター 3個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ランキング</span><span class="volbadge-tip__vol">35,233</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">日本で一番売れてるサプリメント</span><span class="volbadge-tip__vol">12,530</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 通販</span><span class="volbadge-tip__vol">10,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">1日に必要な栄養素サプリメント おすすめ</span><span class="volbadge-tip__vol">7,993</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 健康食品</span><span class="volbadge-tip__vol">7,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 種類</span><span class="volbadge-tip__vol">7,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの種類</span><span class="volbadge-tip__vol">7,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 栄養素</span><span class="volbadge-tip__vol">6,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">本当に効果のあるサプリ</span><span class="volbadge-tip__vol">4,433</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 購入</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエットサプリメント ランキング</span><span class="volbadge-tip__vol">4,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントとは</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 種類一覧</span><span class="volbadge-tip__vol">2,803</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 一覧</span><span class="volbadge-tip__vol">2,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 安全</span><span class="volbadge-tip__vol">1,906</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの効果</span><span class="volbadge-tip__vol">1,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メリット</span><span class="volbadge-tip__vol">1,156</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン効果一覧</span><span class="volbadge-tip__vol">920</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhcサプリ 効果一覧</span><span class="volbadge-tip__vol">880</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 効果 ある のか</span><span class="volbadge-tip__vol">826</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント効果一覧</span><span class="volbadge-tip__vol">633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲んだ方がいい サプリメント</span><span class="volbadge-tip__vol">633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">効果のある サプリ ランキング</span><span class="volbadge-tip__vol">553</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント の デメリット</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲んでも効かないサプリ一覧</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">体に いい サプリメント</span><span class="volbadge-tip__vol">480</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲んだ 方がいい サプリ 女性</span><span class="volbadge-tip__vol">390</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">効く サプリ実名リスト</span><span class="volbadge-tip__vol">300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ランキング 女性</span><span class="volbadge-tip__vol">300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美容サプリメント ランキング</span><span class="volbadge-tip__vol">280</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">体 に いい サプリメント ランキング</span><span class="volbadge-tip__vol">263</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー サプリメント 種類</span><span class="volbadge-tip__vol">253</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントおすすめ女性50代</span><span class="volbadge-tip__vol">233</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 市販</span><span class="volbadge-tip__vol">226</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント効果なし論文</span><span class="volbadge-tip__vol">226</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">amazon サプリメント ランキング</span><span class="volbadge-tip__vol">226</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 栄養補助食品</span><span class="volbadge-tip__vol">213</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養補助食品サプリメント</span><span class="volbadge-tip__vol">213</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メリット デメリット</span><span class="volbadge-tip__vol">213</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 定義</span><span class="volbadge-tip__vol">210</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントランキング男性</span><span class="volbadge-tip__vol">210</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">小林製薬 サプリメント 一覧</span><span class="volbadge-tip__vol">183</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリおすすめ男健康</span><span class="volbadge-tip__vol">183</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 錠剤</span><span class="volbadge-tip__vol">170</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 意味 ない なん j</span><span class="volbadge-tip__vol">170</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養サプリ意味ない</span><span class="volbadge-tip__vol">150</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントと健康食品の違い</span><span class="volbadge-tip__vol">150</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 何がいい</span><span class="volbadge-tip__vol">140</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 成分</span><span class="volbadge-tip__vol">130</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 成分</span><span class="volbadge-tip__vol">130</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 食品</span><span class="volbadge-tip__vol">130</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 医薬部外品</span><span class="volbadge-tip__vol">113</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養不足 サプリ おすすめ</span><span class="volbadge-tip__vol">96</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントとは 簡単に</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 値段</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 値段</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">薬剤師サプリ</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 タブレット</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 補助 サプリ</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ効果あるのか 知恵袋</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント エビデンス レベル</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 意味 ない 理由</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント種類と効果</span><span class="volbadge-tip__vol">66</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 高い</span><span class="volbadge-tip__vol">63</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリで栄養をとるデメリット</span><span class="volbadge-tip__vol">63</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ セット</span><span class="volbadge-tip__vol">60</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康補助食品 サプリメント</span><span class="volbadge-tip__vol">56</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">health サプリ</span><span class="volbadge-tip__vol">50</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 話題</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 例</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビックカメラ サプリ</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">nmn25000</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ より 食事</span><span class="volbadge-tip__vol">30</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 全部 入り</span><span class="volbadge-tip__vol">26</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 効果が 出る まで の期間</span><span class="volbadge-tip__vol">26</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 食品 錠剤</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント カタログ</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養補給 錠剤</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 売上ランキング 世界</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント の 利用 の 仕方</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 検索</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 含有量</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 違い</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 商品名</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康のためのサプリメント</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 医薬部外品 違い</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 使用率</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 サプリ 市販</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">植物 サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 を 補う サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル 基本栄養パック 口コミ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 寿命</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">オプショナルサプリメント とは</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">有効成分 サプリメント</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 監修</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベース サプリメント 種類</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">鉄分 乳酸菌 飲み合わせ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント なぜ 飲む</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 サプリ 種類</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康サポートサプリメント</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">野菜 1日分サプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康サポート サプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリwiki</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 成分 効果</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ やめて みる</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>情報入門型・機能検証型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">製品を選ぶ前に、どんな種類があり、どの成分がどんな役割を果たすのか、不足している栄養を実際に補えるのかを先に確かめたい人たちです。効果への懐疑とランキングの確認が、同じ流れのなかに同居しています。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント効果一覧</span><span class="persona-kbf__kw">サプリメント 栄養素</span><span class="persona-kbf__kw">サプリメントの効果</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">成分・種類の一覧と効果の根拠を同じページで示さないと、信頼が途中で切れてしまいます。効果を断定する文言よりも、根拠と限界を併記する書き方がこの群の懐疑的なクエリに合います。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメント ランキング<span class="persona-ev__vol">35,233</span></span><span class="persona-ev__item">日本で一番売れてるサプリメント<span class="persona-ev__vol">12,530</span></span><span class="persona-ev__item">サプリメント 通販<span class="persona-ev__vol">10,400</span></span><span class="persona-ev__item">健康サプリメント<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">1日に必要な栄養素サプリメント おすすめ<span class="persona-ev__vol">7,993</span></span><span class="persona-ev__item">サプリメント 健康食品<span class="persona-ev__vol">7,933</span></span><span class="persona-ev__item">サプリ 種類<span class="persona-ev__vol">7,800</span></span><span class="persona-ev__item">サプリメントの種類<span class="persona-ev__vol">7,800</span></span><span class="persona-ev__item persona-ev__more">ほか 98件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">02</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">条件別のおすすめ・ブランドラインナップ探索</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 99,480 · キーワード 65件 · クラスター 2個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントおすすめ</span><span class="volbadge-tip__vol">31,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント dhc</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット おすすめ サプリメント</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの選び方</span><span class="volbadge-tip__vol">7,740</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">おすすめ サプリメント 健康</span><span class="volbadge-tip__vol">5,633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントおすすめ 美容</span><span class="volbadge-tip__vol">2,066</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ50代</span><span class="volbadge-tip__vol">1,290</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 女性</span><span class="volbadge-tip__vol">1,120</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ男</span><span class="volbadge-tip__vol">1,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 30代</span><span class="volbadge-tip__vol">753</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 肌</span><span class="volbadge-tip__vol">590</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 20代</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ディアナチュラ dhc どっちがいい</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メーカー</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">amazon サプリメント</span><span class="volbadge-tip__vol">450</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ メーカー</span><span class="volbadge-tip__vol">390</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhaサプリ dhc</span><span class="volbadge-tip__vol">366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 目の サプリ</span><span class="volbadge-tip__vol">366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc アミノ酸</span><span class="volbadge-tip__vol">300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">富士薬品 サプリメント</span><span class="volbadge-tip__vol">263</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ブランド</span><span class="volbadge-tip__vol">203</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 40代</span><span class="volbadge-tip__vol">196</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ディアナチュラ おすすめ</span><span class="volbadge-tip__vol">150</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 に 良い サプリメント</span><span class="volbadge-tip__vol">120</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">日本のサプリ</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">安全な サプリ</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 薬局</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント オンライン</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ハーバー サプリメント</span><span class="volbadge-tip__vol">56</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc にんにく サプリ</span><span class="volbadge-tip__vol">53</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 大手</span><span class="volbadge-tip__vol">53</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">体 サプリ</span><span class="volbadge-tip__vol">50</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ ナチュラル</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 激安</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 語源</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 福袋2026</span><span class="volbadge-tip__vol">30</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル dhc どっち</span><span class="volbadge-tip__vol">26</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc イミダペプチド</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ代月</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリ 酸化 チタン</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 添加物</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc ファンケル サプリメント 比較</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ケラチン サプリ ファンケル</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 身長伸ばすサプリ</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリ 安い</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル サラシア</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ にかける お金</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル漢方</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ユーグレナ ファンケル</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc cm サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc口コミ サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">フラボノイド サプリ dhc</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc eaa</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc アレルギー サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 20 代 サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 月額 平均</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 月 いくら</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ おすすめ サイト</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc パーフェクトサプリ amazon</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">膝 サプリ dhc</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc カルシウム 60</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc ナイアシン アミド サプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 膝に効くサプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc か ファンケル サプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル か dhc</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>ブランド比較型・購入直前型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">年代や性別、目的（美容・ダイエット・肌）を自分の条件として設定し、自分に合うものを絞り込もうとする人たちです。条件が定まると、特定ブランドの製品群や価格、競合ブランドとの優劣へとすぐに移っていきます。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメントおすすめ</span><span class="persona-kbf__kw">サプリメント dhc</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">条件（年代・性別・目的）を軸にしたおすすめコンテンツから、自社ラインナップの比較表へ自然につながる動線が有効です。ブランド同士を比べるクエリが実在するため、避けずに正面から扱うほうが有利に働きます。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメントおすすめ<span class="persona-ev__vol">31,566</span></span><span class="persona-ev__item">サプリメント dhc<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">ダイエット おすすめ サプリメント<span class="persona-ev__vol">11,366</span></span><span class="persona-ev__item">サプリメントの選び方<span class="persona-ev__vol">7,740</span></span><span class="persona-ev__item">おすすめ サプリメント 健康<span class="persona-ev__vol">5,633</span></span><span class="persona-ev__item">サプリメントおすすめ 美容<span class="persona-ev__vol">2,066</span></span><span class="persona-ev__item">サプリメント おすすめ50代<span class="persona-ev__vol">1,290</span></span><span class="persona-ev__item">サプリメント おすすめ 女性<span class="persona-ev__vol">1,120</span></span><span class="persona-ev__item persona-ev__more">ほか 57件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">03</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">用語・剤形の理解とサプライチェーン調査</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 88,894 · キーワード 98件 · クラスター 4個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント</span><span class="volbadge-tip__vol">31,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ</span><span class="volbadge-tip__vol">22,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 英語</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dietary 意味</span><span class="volbadge-tip__vol">6,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ゴマ 英語</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント英語</span><span class="volbadge-tip__vol">2,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント一覧</span><span class="volbadge-tip__vol">2,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplement意味</span><span class="volbadge-tip__vol">1,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリメント一覧</span><span class="volbadge-tip__vol">1,300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 基本</span><span class="volbadge-tip__vol">960</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ の 意味</span><span class="volbadge-tip__vol">633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント の 意味</span><span class="volbadge-tip__vol">633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー サプリメント一覧</span><span class="volbadge-tip__vol">553</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メーカー 信頼性 ランキング</span><span class="volbadge-tip__vol">450</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベジカプセルとは</span><span class="volbadge-tip__vol">343</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医療 lp</span><span class="volbadge-tip__vol">343</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">化粧品lp</span><span class="volbadge-tip__vol">283</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントoem小ロット</span><span class="volbadge-tip__vol">243</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ lp</span><span class="volbadge-tip__vol">183</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サービスlp</span><span class="volbadge-tip__vol">160</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント日本語</span><span class="volbadge-tip__vol">156</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">安全なサプリメント メーカー</span><span class="volbadge-tip__vol">150</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康食品 サプリメント ランキング</span><span class="volbadge-tip__vol">130</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">btob lp</span><span class="volbadge-tip__vol">120</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医薬部外品サプリメント</span><span class="volbadge-tip__vol">113</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー ランキング</span><span class="volbadge-tip__vol">103</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメンタル 英語</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 中国語</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 食品 lp</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美容 液lp</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">売れるlp例</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント と は 意味</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントとは意味</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">lp ライブラリ</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 分類</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 分類</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ oem 儲からない</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー 飲むサプリ 効果</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー 日本 ランキング</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ デザイン</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dietary supplement意味</span><span class="volbadge-tip__vol">63</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリ 値段 一覧</span><span class="volbadge-tip__vol">63</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリ 海外</span><span class="volbadge-tip__vol">56</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康食品とはサプリ</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 成分一覧</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベース サプリメント と は</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベースサプリメントとは</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントを飲む英語</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">指定医薬部外品サプリメント 違い</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">総合 サプリメント ランキング</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplement 語源</span><span class="volbadge-tip__vol">30</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 大手ランキング</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">lp 食品</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">論文supplementary</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ タブレットカプセル どっち</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 目的</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ソフトカプセル体に悪い</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 食品 サプリメント 英語</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリメント 英語</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー一覧</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 製造工場</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">health food 意味</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplementary material論文</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメンタル 意味</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ錠剤 カプセル 吸収率</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ グミ 錠剤 どっち</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントとは何か</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplement サプリメント</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医薬部外品 サプリメント 違い</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 英語 スペル</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">小林 サプリ</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント oem ランキング</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康補助食品 英語</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康食品英文</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メンタリー 論文</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">論文 supplement とは</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ソフト ジェル と は サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ形状吸収率</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 初めて</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">そーりーめんとは</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">食 生活 改善 サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー 海外</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 lp</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養補助食品 英語 略</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメンタリー</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ヘルスサプリメントとは</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの 利用</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">オプショナルサプリメントとは</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント とは 意味</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 英語 発音</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 税番</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 栄養士</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">九州 サプリメント 会社</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医薬品 lp</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">肌 lp</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 器具 lp</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美容 サプリ lp</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>定義確認型・事業者調査型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">言葉そのものの意味や英語表記、錠剤とカプセルのような剤形の違いを確かめる入門クエリが一方の軸で、製造会社やOEM・販売チャネルを調べる事業者視点のクエリがもう一方の軸です。同じキーワードを使いながら、消費者と供給側が混ざっています。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント</span><span class="persona-kbf__kw">サプリメント英語</span><span class="persona-kbf__kw">サプリメント メーカー</span><span class="persona-kbf__kw">サプリ lp</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">消費者向けの説明と事業者向けの情報が一つのキーワードに絡んでいるため、入口を分けて設計する余地があります。剤形の違いと吸収に関する説明は、入門者の最初の理解を助けると同時に、製品の差別化の根拠としても使えます。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメント<span class="persona-ev__vol">31,566</span></span><span class="persona-ev__item">サプリ<span class="persona-ev__vol">22,200</span></span><span class="persona-ev__item">栄養 英語<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">dietary 意味<span class="persona-ev__vol">6,600</span></span><span class="persona-ev__item">ゴマ 英語<span class="persona-ev__vol">4,400</span></span><span class="persona-ev__item">サプリメント英語<span class="persona-ev__vol">2,733</span></span><span class="persona-ev__item">サプリメント一覧<span class="persona-ev__vol">2,466</span></span><span class="persona-ev__item">supplement意味<span class="persona-ev__vol">1,400</span></span><span class="persona-ev__item persona-ev__more">ほか 90件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">04</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">飲むタイミング・継続の管理</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 29,349 · キーワード 39件 · クラスター 2個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲むタイミング</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 選び方</span><span class="volbadge-tip__vol">7,740</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛 サプリメント 飲む タイミング</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲むとやばいサプリ一覧</span><span class="volbadge-tip__vol">1,573</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリメント いつ飲む</span><span class="volbadge-tip__vol">1,260</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲むタイミング 鉄</span><span class="volbadge-tip__vol">1,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント飲むタイミング寝る前</span><span class="volbadge-tip__vol">553</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲む タイミング 葉酸</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントはいつ飲むのが 効果的ですか</span><span class="volbadge-tip__vol">450</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 寝る 前に 飲む</span><span class="volbadge-tip__vol">280</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント持ち運び</span><span class="volbadge-tip__vol">280</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント組み合わせ</span><span class="volbadge-tip__vol">243</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンe いつ飲む</span><span class="volbadge-tip__vol">173</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ コーヒーで飲む</span><span class="volbadge-tip__vol">140</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲む タイミング 1日1回</span><span class="volbadge-tip__vol">140</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 1日3粒 飲み方</span><span class="volbadge-tip__vol">123</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 小分け アイデア</span><span class="volbadge-tip__vol">120</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント飲むタイミング朝夜</span><span class="volbadge-tip__vol">113</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ飲むタイミング ビタミン</span><span class="volbadge-tip__vol">103</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルコサミン いつ飲む</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 腐る</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルコサミン アクティブ いつ飲む</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 取り方</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリ 食前 食後</span><span class="volbadge-tip__vol">40</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント を 飲む 英語</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ウェルネス サプリメント</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">コーヒー飲んだ後 サプリ</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 続か ない</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カルシウム不足 不眠</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 湿気</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント続かない理由</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲む タイミング カルシウム</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 名前 一覧</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 綿</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲む タイミング 肝臓</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ ビール で 飲む</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dha&amp;epa+セサミンex いつ飲む</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリめんどくさい</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 冷凍</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>使用実行型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">すでに購入した、あるいは購入を決めたあとに、いつ飲めばよいのか、何と一緒に飲んではいけないのかを確認する人たちです。飲むこと自体が面倒で続かないという問題や、保管・持ち運びの悩みも同じ場所にあります。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 飲むタイミング</span><span class="persona-kbf__kw">サプリめんどくさい</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">成分別の飲むタイミング案内は、リピート購入につながる接点です。継続を助ける保管・持ち運び・小分けといった生活単位のコンテンツが、離脱を防ぐ役割を果たします。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメント 飲むタイミング<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">サプリメント 選び方<span class="persona-ev__vol">7,740</span></span><span class="persona-ev__item">亜鉛 サプリメント 飲む タイミング<span class="persona-ev__vol">5,800</span></span><span class="persona-ev__item">飲むとやばいサプリ一覧<span class="persona-ev__vol">1,573</span></span><span class="persona-ev__item">ビタミン サプリメント いつ飲む<span class="persona-ev__vol">1,260</span></span><span class="persona-ev__item">サプリメント 飲むタイミング 鉄<span class="persona-ev__vol">1,200</span></span><span class="persona-ev__item">サプリメント飲むタイミング寝る前<span class="persona-ev__vol">553</span></span><span class="persona-ev__item">サプリメント 飲む タイミング 葉酸<span class="persona-ev__vol">516</span></span><span class="persona-ev__item persona-ev__more">ほか 31件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">05</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">安全性・信頼性の点検</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 8,133 · キーワード 46件 · クラスター 2個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">アイハーブ怪しい</span><span class="volbadge-tip__vol">1,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲むと やばい サプリ 一覧dhc</span><span class="volbadge-tip__vol">1,206</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 海外</span><span class="volbadge-tip__vol">826</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 危険性</span><span class="volbadge-tip__vol">730</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">iherb サプリメント</span><span class="volbadge-tip__vol">720</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント飲まない方が良い</span><span class="volbadge-tip__vol">590</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲ん では いけない サプリメント</span><span class="volbadge-tip__vol">420</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外 ダイエットサプリ 激やせランキング</span><span class="volbadge-tip__vol">320</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 副作用 一覧</span><span class="volbadge-tip__vol">260</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">iherbおすすめサプリ美肌</span><span class="volbadge-tip__vol">210</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 過剰摂取 症状</span><span class="volbadge-tip__vol">160</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外 サプリ 通販 おすすめ</span><span class="volbadge-tip__vol">110</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 安全性</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メーカー 信頼性ランキング2ch</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲ん では いけない サプリメント知恵袋</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外サプリメントおすすめ</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 通販サイト おすすめ</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ランキング世界</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 危険性 亜鉛</span><span class="volbadge-tip__vol">56</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外サプリ 危険性</span><span class="volbadge-tip__vol">53</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外 サプリメント通販サイト</span><span class="volbadge-tip__vol">53</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外サプリメント 店舗東京</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントを 飲み続けると どうなる</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベースサプリとは</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 規制</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外 サプリ 個人 輸入</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外サプリ メーカー 信頼性 ランキング</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ個人輸入 おすすめ</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 歴史</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントを利用する場合の注意点</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントと健康</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">トクホ危険性</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 危険性 小林製薬</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント信頼 性</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplement sale</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メーカー 信頼 性 ランキング 海外</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養指導の意義 目的 サプリメント</span><span class="volbadge-tip__vol">6</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 正しい利用法</span><span class="volbadge-tip__vol">6</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 上手に活用するには</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">日本のサプリメントの現状</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 サプリメント メリット デメリット</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 現状</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリのメリット デメリット</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 利用状況</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">安全 な サプリメント メーカー 海外</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外アスリート サプリメント</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>リスク回避型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">副作用や過剰摂取、特定企業の問題を思い浮かべながら「飲んでも大丈夫か」を確かめようとする人たちです。国内製品の安全性の確認は、海外製品の信頼度や購入経路の点検へもつながっていきます。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 危険性</span><span class="persona-kbf__kw">サプリメント 海外</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">安全に関するクエリは否定形で入ってくるため、リスクを避ける表現よりも、成分別の上限量や併用の注意を明記する情報のほうが信頼を生みます。原料の出所と製造管理の情報を表に出すことが、この群の不安に直接応えます。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">アイハーブ怪しい<span class="persona-ev__vol">1,600</span></span><span class="persona-ev__item">飲むと やばい サプリ 一覧dhc<span class="persona-ev__vol">1,206</span></span><span class="persona-ev__item">サプリメント 海外<span class="persona-ev__vol">826</span></span><span class="persona-ev__item">サプリメント 危険性<span class="persona-ev__vol">730</span></span><span class="persona-ev__item">iherb サプリメント<span class="persona-ev__vol">720</span></span><span class="persona-ev__item">サプリメント飲まない方が良い<span class="persona-ev__vol">590</span></span><span class="persona-ev__item">飲ん では いけない サプリメント<span class="persona-ev__vol">420</span></span><span class="persona-ev__item">海外 ダイエットサプリ 激やせランキング<span class="persona-ev__vol">320</span></span><span class="persona-ev__item persona-ev__more">ほか 38件</span></div></div></div></div></div></div>
+      <div class="dash-tab-panel active" role="tabpanel" aria-labelledby="dash-tab-0" data-panel="0"><div class="dash-card cl-section"><div class="dash-card__head"><span class="dash-card__title">ハブキーワード一覧</span></div><p class="persona-section-desc">各検索目的クラスターの代表（ハブ）キーワードです。ハブは一緒に検索される関係がもっとも多い中心キーワードで、そのクラスターを代表します。</p><div class="dash-card__body"><div class="cl-hubtable-wrap"><table class="cl-hubtable"><thead><tr><th>検索目的クラスター</th><th>クラスター</th><th>代表（ハブ）キーワード</th></tr></thead><tbody><tr><td class="cl-hubtable__group">種類・成分・効果の確認</td><td class="cl-hubtable__clusters">G, I, D</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメント効果一覧</span><span class="cl-hub-chip">サプリメント 栄養素</span><span class="cl-hub-chip">サプリメントの効果</span></td></tr><tr><td class="cl-hubtable__group">条件別のおすすめ・ブランドラインナップ探索</td><td class="cl-hubtable__clusters">B, L</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメントおすすめ</span><span class="cl-hub-chip">サプリメント dhc</span></td></tr><tr><td class="cl-hubtable__group">用語・剤形の理解とサプライチェーン調査</td><td class="cl-hubtable__clusters">A, H, C, M</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメント</span><span class="cl-hub-chip">サプリメント英語</span><span class="cl-hub-chip">サプリメント メーカー</span><span class="cl-hub-chip">サプリ lp</span></td></tr><tr><td class="cl-hubtable__group">飲むタイミング・継続の管理</td><td class="cl-hubtable__clusters">K, F</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメント 飲むタイミング</span><span class="cl-hub-chip">サプリめんどくさい</span></td></tr><tr><td class="cl-hubtable__group">安全性・信頼性の点検</td><td class="cl-hubtable__clusters">E, J</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメント 危険性</span><span class="cl-hub-chip">サプリメント 海外</span></td></tr></tbody></table></div></div></div></div>
+      <div class="dash-tab-panel" role="tabpanel" aria-labelledby="dash-tab-1" data-panel="1"><div class="dash-card cl-section"><div class="dash-card__head"><span class="dash-card__title">検索の流れ (From → To)</span></div><p class="persona-section-desc">ハブキーワードを起点に関心が移動していく代表的な経路です。あるクラスターから別のクラスターへつながる探索の流れを示します。</p><div class="dash-card__body cl-flows"><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメント</span><span class="cl-flow__meta">月間検索数 31,566 · 接続クラスター 13個 · 総称での探索 → 条件別の絞り込み</span></div><div class="cl-flow__path"><span class="cl-flow__node">A · サプリメント</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">B · サプリメントおすすめ</span></div><div class="cl-flow__insight">カテゴリ全体を見渡す段階では、まだ自分の条件が定まっていません。年代・性別・目的という軸に出会った瞬間におすすめクエリへ移り、候補が一気に絞られます。</div></div><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメントおすすめ</span><span class="cl-flow__meta">月間検索数 31,566 · 接続クラスター 5個 · おすすめの受け取り → 効果の再検証</span></div><div class="cl-flow__path"><span class="cl-flow__node">B · サプリメントおすすめ</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">D · サプリメントの効果</span></div><div class="cl-flow__insight">おすすめ一覧を見たあと、すぐには買わずに、その推奨が本当に正しいのかを問い直す段階へ進みます。効果やランキングと突き合わせる動きであり、おすすめコンテンツだけでは転換が完結しません。</div></div><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメント効果一覧</span><span class="cl-flow__meta">月間検索数 633 · 接続クラスター 8個 · 成分の理解 → リスクの確認</span></div><div class="cl-flow__path"><span class="cl-flow__node">G · サプリメント効果一覧</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">E · サプリメント 危険性</span></div><div class="cl-flow__insight">成分と効果を把握するほど、過剰摂取や副作用という反対側の問いがついてきます。効果の説明と注意事項が分かれていると、この地点で離脱が起きます。</div></div><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメント dhc</span><span class="cl-flow__meta">月間検索数 31,100 · 接続クラスター 5個 · ブランドの確定 → 飲用の実行</span></div><div class="cl-flow__path"><span class="cl-flow__node">L · サプリメント dhc</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">K · サプリメント 飲むタイミング</span></div><div class="cl-flow__insight">特定ブランドの製品に絞り込まれたあとは、関心が「どう飲むか」へ移ります。購入直後の飲み方案内が、ブランド体験の延長線上に置かれる区間です。</div></div><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメント 危険性</span><span class="cl-flow__meta">月間検索数 730 · 接続クラスター 6個 · 安全への不安 → 供給元の再点検</span></div><div class="cl-flow__path"><span class="cl-flow__node">E · サプリメント 危険性</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">J · サプリメント 海外</span></div><div class="cl-flow__insight">安全性への疑いが生まれると、製品そのものよりも、どこで作りどこで買うのかへ関心が移ります。海外の個人輸入やメーカーの信頼度確認が、同じ不安の延長として現れます。</div></div></div></div></div>
+      <div class="dash-tab-panel" role="tabpanel" aria-labelledby="dash-tab-1" data-panel="1"><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">総合的な示唆</span></div><div class="dash-card__body"><p class="mr-summary-text">日本のサプリメント市場の検索地形では、「選ぶ軸」と「疑う軸」が同時に働いています。条件別のおすすめとブランドのラインナップが需要を集める一方で、その直後に効果と安全性を問い直す群への移動が起こり、おすすめだけでは結論に至りません。購入後は飲むタイミングと継続の管理が別の大きな群を形づくっており、リピートの接点が購入前ではなく使用の局面に置かれていることを示しています。</p></div></div><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">主要インサイト</span><span class="dash-card__badge">3件</span></div><div class="dash-card__body"><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>おすすめの次には必ず検証が来る</div><div class="rpt-act-card__body">おすすめの群から効果・ランキングの群へ向かうつながりが実在します。おすすめコンテンツを終着点として設計すると、検証の段階を競合のページに渡すことになります。</div></div><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>効果の説明とリスク情報は一体である</div><div class="rpt-act-card__body">成分と効果をまとめた群が、過剰摂取・副作用の群と直接つながっています。この二つの情報がサイト構造上で分かれていると、この転換点で離脱が生じます。</div></div><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>飲用の局面が独立した需要をつくる</div><div class="rpt-act-card__body">いつ飲むか、何と一緒に飲むかを問う群が独立して存在し、続かない悩みや保管の悩みが同じ場所にまとまっています。購入後のコミュニケーションが事実上もう一つの検索市場です。</div></div></div></div></div><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">いますぐ試せること</span><span class="dash-card__badge">3件</span></div><div class="dash-card__body"><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>おすすめページに根拠のブロックを添える</div><div class="rpt-act-card__body">年代・性別・目的別のおすすめの下に成分の根拠と限界を併記し、検証クエリがサイト内で解消されるようにします。</div></div><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>成分別の飲むタイミングガイドをつくる</div><div class="rpt-act-card__body">鉄・亜鉛・葉酸のようにタイミングのクエリがつく成分を基準に案内を整理し、製品ページから直接たどり着けるようにします。</div></div><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>安全情報を避けずに表に出す</div><div class="rpt-act-card__body">上限量や併用の注意、原料・製造管理の情報を製品情報の前段に置き、否定形のクエリに正面から応えます。</div></div></div></div></div><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">これから注目したい機会</span><span class="dash-card__badge">3件</span></div><div class="dash-card__body"><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>継続を助ける生活単位のコンテンツ</div><div class="rpt-act-card__body">小分け・持ち運び・保管のように継続の離脱を防ぐテーマは、まだブランドが積極的に扱っていない領域です。リピート率と直接つながる余地があります。</div></div><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>海外個人輸入の需要を引き戻す</div><div class="rpt-act-card__body">安全への不安が海外製品の信頼度調査へつながる経路が確認できます。国内製造・品質管理のメッセージでこの流れを引き戻す接点があります。</div></div><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>入門用語の検索を先取りする</div><div class="rpt-act-card__body">定義や剤形の違いを問うクエリは、購入前の最初の接触面です。ブランド色を抑えたやさしい説明が、長期的な入口になります。</div></div></div></div></div></div>
+    </div>
+  </div>
+
+  <div class="view-a4">
+    <div class="a4-scroll">
+      <div class="rpt-page rpt-page--cover" id="page-0"><div class="cover-body"><div><div class="cover-lm">ListeningMind.AI</div><div class="cover-title">検索クラスター地形分析</div><div class="cover-category">サプリメント</div><div class="cover-meta"><span>2026-09-14</span><span class="cover-meta-sep">|</span><span>検索目的クラスター 5</span></div></div></div></div>
+      <div class="rpt-page" id="page-1"><div class="page-body"><div class="mr-summary-box"><div class="mr-summary-box__title">背景と目的</div><p class="mr-summary-text--sm">本レポートは「サプリメント」と一緒に検索されるキーワードが形づくる検索クラスター（同時検索の群）を分析し、日本（Google）市場にどのような検索目的の地形と探索の流れが存在するのかを把握するために作成しました。ListeningMind クラスターファインダーの同時検索グラフでキーワード群を収集し、検索数にもとづいて検索目的クラスターとハブキーワードを導き出しています。</p><p class="mr-summary-text--sm mr-overview">サプリメント市場の検索は「何を選ぶか」と「本当に効くのか、安全なのか」という二つの軸を中心に動いており、条件別のおすすめ探しとブランドのラインナップ探索が需要の重心をつくっています。その周囲に、種類や成分の確認、飲むタイミングと継続の管理、安全性と流通経路の点検が衛星のように並び、購入前の検証構造を形づくっています。</p></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">01</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">種類・成分・効果の確認</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 143,586 · キーワード 106件 · クラスター 3個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ランキング</span><span class="volbadge-tip__vol">35,233</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">日本で一番売れてるサプリメント</span><span class="volbadge-tip__vol">12,530</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 通販</span><span class="volbadge-tip__vol">10,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">1日に必要な栄養素サプリメント おすすめ</span><span class="volbadge-tip__vol">7,993</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 健康食品</span><span class="volbadge-tip__vol">7,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 種類</span><span class="volbadge-tip__vol">7,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの種類</span><span class="volbadge-tip__vol">7,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 栄養素</span><span class="volbadge-tip__vol">6,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">本当に効果のあるサプリ</span><span class="volbadge-tip__vol">4,433</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 購入</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエットサプリメント ランキング</span><span class="volbadge-tip__vol">4,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントとは</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 種類一覧</span><span class="volbadge-tip__vol">2,803</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 一覧</span><span class="volbadge-tip__vol">2,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 安全</span><span class="volbadge-tip__vol">1,906</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの効果</span><span class="volbadge-tip__vol">1,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メリット</span><span class="volbadge-tip__vol">1,156</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン効果一覧</span><span class="volbadge-tip__vol">920</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhcサプリ 効果一覧</span><span class="volbadge-tip__vol">880</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 効果 ある のか</span><span class="volbadge-tip__vol">826</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント効果一覧</span><span class="volbadge-tip__vol">633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲んだ方がいい サプリメント</span><span class="volbadge-tip__vol">633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">効果のある サプリ ランキング</span><span class="volbadge-tip__vol">553</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント の デメリット</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲んでも効かないサプリ一覧</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">体に いい サプリメント</span><span class="volbadge-tip__vol">480</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲んだ 方がいい サプリ 女性</span><span class="volbadge-tip__vol">390</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">効く サプリ実名リスト</span><span class="volbadge-tip__vol">300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ランキング 女性</span><span class="volbadge-tip__vol">300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美容サプリメント ランキング</span><span class="volbadge-tip__vol">280</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">体 に いい サプリメント ランキング</span><span class="volbadge-tip__vol">263</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー サプリメント 種類</span><span class="volbadge-tip__vol">253</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントおすすめ女性50代</span><span class="volbadge-tip__vol">233</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 市販</span><span class="volbadge-tip__vol">226</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント効果なし論文</span><span class="volbadge-tip__vol">226</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">amazon サプリメント ランキング</span><span class="volbadge-tip__vol">226</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 栄養補助食品</span><span class="volbadge-tip__vol">213</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養補助食品サプリメント</span><span class="volbadge-tip__vol">213</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メリット デメリット</span><span class="volbadge-tip__vol">213</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 定義</span><span class="volbadge-tip__vol">210</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントランキング男性</span><span class="volbadge-tip__vol">210</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">小林製薬 サプリメント 一覧</span><span class="volbadge-tip__vol">183</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリおすすめ男健康</span><span class="volbadge-tip__vol">183</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 錠剤</span><span class="volbadge-tip__vol">170</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 意味 ない なん j</span><span class="volbadge-tip__vol">170</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養サプリ意味ない</span><span class="volbadge-tip__vol">150</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントと健康食品の違い</span><span class="volbadge-tip__vol">150</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 何がいい</span><span class="volbadge-tip__vol">140</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 成分</span><span class="volbadge-tip__vol">130</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 成分</span><span class="volbadge-tip__vol">130</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 食品</span><span class="volbadge-tip__vol">130</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 医薬部外品</span><span class="volbadge-tip__vol">113</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養不足 サプリ おすすめ</span><span class="volbadge-tip__vol">96</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントとは 簡単に</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 値段</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 値段</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">薬剤師サプリ</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 タブレット</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 補助 サプリ</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ効果あるのか 知恵袋</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント エビデンス レベル</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 意味 ない 理由</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント種類と効果</span><span class="volbadge-tip__vol">66</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 高い</span><span class="volbadge-tip__vol">63</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリで栄養をとるデメリット</span><span class="volbadge-tip__vol">63</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ セット</span><span class="volbadge-tip__vol">60</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康補助食品 サプリメント</span><span class="volbadge-tip__vol">56</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">health サプリ</span><span class="volbadge-tip__vol">50</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 話題</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 例</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビックカメラ サプリ</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">nmn25000</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ より 食事</span><span class="volbadge-tip__vol">30</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 全部 入り</span><span class="volbadge-tip__vol">26</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 効果が 出る まで の期間</span><span class="volbadge-tip__vol">26</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 食品 錠剤</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント カタログ</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養補給 錠剤</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 売上ランキング 世界</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント の 利用 の 仕方</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 検索</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 含有量</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 違い</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 商品名</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康のためのサプリメント</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 医薬部外品 違い</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 使用率</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 サプリ 市販</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">植物 サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 を 補う サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル 基本栄養パック 口コミ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 寿命</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">オプショナルサプリメント とは</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">有効成分 サプリメント</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 監修</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベース サプリメント 種類</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">鉄分 乳酸菌 飲み合わせ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント なぜ 飲む</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 サプリ 種類</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康サポートサプリメント</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">野菜 1日分サプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康サポート サプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリwiki</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 成分 効果</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ やめて みる</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>情報入門型・機能検証型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">製品を選ぶ前に、どんな種類があり、どの成分がどんな役割を果たすのか、不足している栄養を実際に補えるのかを先に確かめたい人たちです。効果への懐疑とランキングの確認が、同じ流れのなかに同居しています。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント効果一覧</span><span class="persona-kbf__kw">サプリメント 栄養素</span><span class="persona-kbf__kw">サプリメントの効果</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">成分・種類の一覧と効果の根拠を同じページで示さないと、信頼が途中で切れてしまいます。効果を断定する文言よりも、根拠と限界を併記する書き方がこの群の懐疑的なクエリに合います。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメント ランキング<span class="persona-ev__vol">35,233</span></span><span class="persona-ev__item">日本で一番売れてるサプリメント<span class="persona-ev__vol">12,530</span></span><span class="persona-ev__item">サプリメント 通販<span class="persona-ev__vol">10,400</span></span><span class="persona-ev__item">健康サプリメント<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">1日に必要な栄養素サプリメント おすすめ<span class="persona-ev__vol">7,993</span></span><span class="persona-ev__item">サプリメント 健康食品<span class="persona-ev__vol">7,933</span></span><span class="persona-ev__item">サプリ 種類<span class="persona-ev__vol">7,800</span></span><span class="persona-ev__item">サプリメントの種類<span class="persona-ev__vol">7,800</span></span><span class="persona-ev__item persona-ev__more">ほか 98件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">02</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">条件別のおすすめ・ブランドラインナップ探索</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 99,480 · キーワード 65件 · クラスター 2個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントおすすめ</span><span class="volbadge-tip__vol">31,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント dhc</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット おすすめ サプリメント</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの選び方</span><span class="volbadge-tip__vol">7,740</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">おすすめ サプリメント 健康</span><span class="volbadge-tip__vol">5,633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントおすすめ 美容</span><span class="volbadge-tip__vol">2,066</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ50代</span><span class="volbadge-tip__vol">1,290</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 女性</span><span class="volbadge-tip__vol">1,120</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ男</span><span class="volbadge-tip__vol">1,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 30代</span><span class="volbadge-tip__vol">753</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 肌</span><span class="volbadge-tip__vol">590</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 20代</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ディアナチュラ dhc どっちがいい</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メーカー</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">amazon サプリメント</span><span class="volbadge-tip__vol">450</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ メーカー</span><span class="volbadge-tip__vol">390</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhaサプリ dhc</span><span class="volbadge-tip__vol">366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 目の サプリ</span><span class="volbadge-tip__vol">366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc アミノ酸</span><span class="volbadge-tip__vol">300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">富士薬品 サプリメント</span><span class="volbadge-tip__vol">263</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ブランド</span><span class="volbadge-tip__vol">203</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 40代</span><span class="volbadge-tip__vol">196</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ディアナチュラ おすすめ</span><span class="volbadge-tip__vol">150</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 に 良い サプリメント</span><span class="volbadge-tip__vol">120</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">日本のサプリ</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">安全な サプリ</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント おすすめ 薬局</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント オンライン</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ハーバー サプリメント</span><span class="volbadge-tip__vol">56</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc にんにく サプリ</span><span class="volbadge-tip__vol">53</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 大手</span><span class="volbadge-tip__vol">53</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">体 サプリ</span><span class="volbadge-tip__vol">50</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ ナチュラル</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 激安</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 語源</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 福袋2026</span><span class="volbadge-tip__vol">30</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル dhc どっち</span><span class="volbadge-tip__vol">26</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc イミダペプチド</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ代月</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリ 酸化 チタン</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 添加物</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc ファンケル サプリメント 比較</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ケラチン サプリ ファンケル</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 身長伸ばすサプリ</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリ 安い</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル サラシア</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ にかける お金</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル漢方</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ユーグレナ ファンケル</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc cm サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc口コミ サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">フラボノイド サプリ dhc</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc eaa</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc アレルギー サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 20 代 サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 月額 平均</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 月 いくら</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ おすすめ サイト</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc パーフェクトサプリ amazon</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">膝 サプリ dhc</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc カルシウム 60</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc ナイアシン アミド サプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 膝に効くサプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc か ファンケル サプリ</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル か dhc</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>ブランド比較型・購入直前型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">年代や性別、目的（美容・ダイエット・肌）を自分の条件として設定し、自分に合うものを絞り込もうとする人たちです。条件が定まると、特定ブランドの製品群や価格、競合ブランドとの優劣へとすぐに移っていきます。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメントおすすめ</span><span class="persona-kbf__kw">サプリメント dhc</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">条件（年代・性別・目的）を軸にしたおすすめコンテンツから、自社ラインナップの比較表へ自然につながる動線が有効です。ブランド同士を比べるクエリが実在するため、避けずに正面から扱うほうが有利に働きます。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメントおすすめ<span class="persona-ev__vol">31,566</span></span><span class="persona-ev__item">サプリメント dhc<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">ダイエット おすすめ サプリメント<span class="persona-ev__vol">11,366</span></span><span class="persona-ev__item">サプリメントの選び方<span class="persona-ev__vol">7,740</span></span><span class="persona-ev__item">おすすめ サプリメント 健康<span class="persona-ev__vol">5,633</span></span><span class="persona-ev__item">サプリメントおすすめ 美容<span class="persona-ev__vol">2,066</span></span><span class="persona-ev__item">サプリメント おすすめ50代<span class="persona-ev__vol">1,290</span></span><span class="persona-ev__item">サプリメント おすすめ 女性<span class="persona-ev__vol">1,120</span></span><span class="persona-ev__item persona-ev__more">ほか 57件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">03</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">用語・剤形の理解とサプライチェーン調査</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 88,894 · キーワード 98件 · クラスター 4個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント</span><span class="volbadge-tip__vol">31,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ</span><span class="volbadge-tip__vol">22,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 英語</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dietary 意味</span><span class="volbadge-tip__vol">6,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ゴマ 英語</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント英語</span><span class="volbadge-tip__vol">2,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント一覧</span><span class="volbadge-tip__vol">2,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplement意味</span><span class="volbadge-tip__vol">1,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリメント一覧</span><span class="volbadge-tip__vol">1,300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 基本</span><span class="volbadge-tip__vol">960</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ の 意味</span><span class="volbadge-tip__vol">633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント の 意味</span><span class="volbadge-tip__vol">633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー サプリメント一覧</span><span class="volbadge-tip__vol">553</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メーカー 信頼性 ランキング</span><span class="volbadge-tip__vol">450</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベジカプセルとは</span><span class="volbadge-tip__vol">343</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医療 lp</span><span class="volbadge-tip__vol">343</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">化粧品lp</span><span class="volbadge-tip__vol">283</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントoem小ロット</span><span class="volbadge-tip__vol">243</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ lp</span><span class="volbadge-tip__vol">183</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サービスlp</span><span class="volbadge-tip__vol">160</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント日本語</span><span class="volbadge-tip__vol">156</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">安全なサプリメント メーカー</span><span class="volbadge-tip__vol">150</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康食品 サプリメント ランキング</span><span class="volbadge-tip__vol">130</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">btob lp</span><span class="volbadge-tip__vol">120</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医薬部外品サプリメント</span><span class="volbadge-tip__vol">113</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー ランキング</span><span class="volbadge-tip__vol">103</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメンタル 英語</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 中国語</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 食品 lp</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美容 液lp</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">売れるlp例</span><span class="volbadge-tip__vol">90</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント と は 意味</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントとは意味</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">lp ライブラリ</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 分類</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 分類</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ oem 儲からない</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー 飲むサプリ 効果</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー 日本 ランキング</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ デザイン</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dietary supplement意味</span><span class="volbadge-tip__vol">63</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリ 値段 一覧</span><span class="volbadge-tip__vol">63</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリ 海外</span><span class="volbadge-tip__vol">56</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康食品とはサプリ</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 成分一覧</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベース サプリメント と は</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベースサプリメントとは</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントを飲む英語</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">指定医薬部外品サプリメント 違い</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">総合 サプリメント ランキング</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplement 語源</span><span class="volbadge-tip__vol">30</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 大手ランキング</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">lp 食品</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">論文supplementary</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ タブレットカプセル どっち</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 目的</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ソフトカプセル体に悪い</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 食品 サプリメント 英語</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリメント 英語</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー一覧</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 製造工場</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">health food 意味</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplementary material論文</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメンタル 意味</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ錠剤 カプセル 吸収率</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ グミ 錠剤 どっち</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントとは何か</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplement サプリメント</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医薬部外品 サプリメント 違い</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 英語 スペル</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">小林 サプリ</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント oem ランキング</span><span class="volbadge-tip__vol">13</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康補助食品 英語</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康食品英文</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メンタリー 論文</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">論文 supplement とは</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ソフト ジェル と は サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ形状吸収率</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 初めて</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">そーりーめんとは</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">食 生活 改善 サプリ</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント メーカー 海外</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 lp</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養補助食品 英語 略</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメンタリー</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ヘルスサプリメントとは</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの 利用</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">オプショナルサプリメントとは</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント とは 意味</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 英語 発音</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 税番</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 栄養士</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">九州 サプリメント 会社</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医薬品 lp</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">肌 lp</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康 器具 lp</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美容 サプリ lp</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>定義確認型・事業者調査型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">言葉そのものの意味や英語表記、錠剤とカプセルのような剤形の違いを確かめる入門クエリが一方の軸で、製造会社やOEM・販売チャネルを調べる事業者視点のクエリがもう一方の軸です。同じキーワードを使いながら、消費者と供給側が混ざっています。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント</span><span class="persona-kbf__kw">サプリメント英語</span><span class="persona-kbf__kw">サプリメント メーカー</span><span class="persona-kbf__kw">サプリ lp</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">消費者向けの説明と事業者向けの情報が一つのキーワードに絡んでいるため、入口を分けて設計する余地があります。剤形の違いと吸収に関する説明は、入門者の最初の理解を助けると同時に、製品の差別化の根拠としても使えます。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメント<span class="persona-ev__vol">31,566</span></span><span class="persona-ev__item">サプリ<span class="persona-ev__vol">22,200</span></span><span class="persona-ev__item">栄養 英語<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">dietary 意味<span class="persona-ev__vol">6,600</span></span><span class="persona-ev__item">ゴマ 英語<span class="persona-ev__vol">4,400</span></span><span class="persona-ev__item">サプリメント英語<span class="persona-ev__vol">2,733</span></span><span class="persona-ev__item">サプリメント一覧<span class="persona-ev__vol">2,466</span></span><span class="persona-ev__item">supplement意味<span class="persona-ev__vol">1,400</span></span><span class="persona-ev__item persona-ev__more">ほか 90件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">04</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">飲むタイミング・継続の管理</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 29,349 · キーワード 39件 · クラスター 2個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲むタイミング</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 選び方</span><span class="volbadge-tip__vol">7,740</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛 サプリメント 飲む タイミング</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲むとやばいサプリ一覧</span><span class="volbadge-tip__vol">1,573</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリメント いつ飲む</span><span class="volbadge-tip__vol">1,260</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲むタイミング 鉄</span><span class="volbadge-tip__vol">1,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント飲むタイミング寝る前</span><span class="volbadge-tip__vol">553</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲む タイミング 葉酸</span><span class="volbadge-tip__vol">516</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントはいつ飲むのが 効果的ですか</span><span class="volbadge-tip__vol">450</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 寝る 前に 飲む</span><span class="volbadge-tip__vol">280</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント持ち運び</span><span class="volbadge-tip__vol">280</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント組み合わせ</span><span class="volbadge-tip__vol">243</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンe いつ飲む</span><span class="volbadge-tip__vol">173</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ コーヒーで飲む</span><span class="volbadge-tip__vol">140</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲む タイミング 1日1回</span><span class="volbadge-tip__vol">140</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 1日3粒 飲み方</span><span class="volbadge-tip__vol">123</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 小分け アイデア</span><span class="volbadge-tip__vol">120</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント飲むタイミング朝夜</span><span class="volbadge-tip__vol">113</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ飲むタイミング ビタミン</span><span class="volbadge-tip__vol">103</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルコサミン いつ飲む</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 腐る</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルコサミン アクティブ いつ飲む</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 取り方</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリ 食前 食後</span><span class="volbadge-tip__vol">40</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント を 飲む 英語</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ウェルネス サプリメント</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">コーヒー飲んだ後 サプリ</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 続か ない</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カルシウム不足 不眠</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 湿気</span><span class="volbadge-tip__vol">16</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント続かない理由</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲む タイミング カルシウム</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 名前 一覧</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 綿</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲む タイミング 肝臓</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ ビール で 飲む</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dha&amp;epa+セサミンex いつ飲む</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリめんどくさい</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 冷凍</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>使用実行型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">すでに購入した、あるいは購入を決めたあとに、いつ飲めばよいのか、何と一緒に飲んではいけないのかを確認する人たちです。飲むこと自体が面倒で続かないという問題や、保管・持ち運びの悩みも同じ場所にあります。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 飲むタイミング</span><span class="persona-kbf__kw">サプリめんどくさい</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">成分別の飲むタイミング案内は、リピート購入につながる接点です。継続を助ける保管・持ち運び・小分けといった生活単位のコンテンツが、離脱を防ぐ役割を果たします。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメント 飲むタイミング<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">サプリメント 選び方<span class="persona-ev__vol">7,740</span></span><span class="persona-ev__item">亜鉛 サプリメント 飲む タイミング<span class="persona-ev__vol">5,800</span></span><span class="persona-ev__item">飲むとやばいサプリ一覧<span class="persona-ev__vol">1,573</span></span><span class="persona-ev__item">ビタミン サプリメント いつ飲む<span class="persona-ev__vol">1,260</span></span><span class="persona-ev__item">サプリメント 飲むタイミング 鉄<span class="persona-ev__vol">1,200</span></span><span class="persona-ev__item">サプリメント飲むタイミング寝る前<span class="persona-ev__vol">553</span></span><span class="persona-ev__item">サプリメント 飲む タイミング 葉酸<span class="persona-ev__vol">516</span></span><span class="persona-ev__item persona-ev__more">ほか 31件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">05</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">安全性・信頼性の点検</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">合計検索数 8,133 · キーワード 46件 · クラスター 2個<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索数</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">アイハーブ怪しい</span><span class="volbadge-tip__vol">1,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲むと やばい サプリ 一覧dhc</span><span class="volbadge-tip__vol">1,206</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 海外</span><span class="volbadge-tip__vol">826</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 危険性</span><span class="volbadge-tip__vol">730</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">iherb サプリメント</span><span class="volbadge-tip__vol">720</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント飲まない方が良い</span><span class="volbadge-tip__vol">590</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲ん では いけない サプリメント</span><span class="volbadge-tip__vol">420</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外 ダイエットサプリ 激やせランキング</span><span class="volbadge-tip__vol">320</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 副作用 一覧</span><span class="volbadge-tip__vol">260</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">iherbおすすめサプリ美肌</span><span class="volbadge-tip__vol">210</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 過剰摂取 症状</span><span class="volbadge-tip__vol">160</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外 サプリ 通販 おすすめ</span><span class="volbadge-tip__vol">110</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 安全性</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メーカー 信頼性ランキング2ch</span><span class="volbadge-tip__vol">83</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">飲ん では いけない サプリメント知恵袋</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外サプリメントおすすめ</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 通販サイト おすすめ</span><span class="volbadge-tip__vol">76</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ランキング世界</span><span class="volbadge-tip__vol">70</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 危険性 亜鉛</span><span class="volbadge-tip__vol">56</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外サプリ 危険性</span><span class="volbadge-tip__vol">53</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外 サプリメント通販サイト</span><span class="volbadge-tip__vol">53</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外サプリメント 店舗東京</span><span class="volbadge-tip__vol">46</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントを 飲み続けると どうなる</span><span class="volbadge-tip__vol">43</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ベースサプリとは</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ 規制</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外 サプリ 個人 輸入</span><span class="volbadge-tip__vol">36</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外サプリ メーカー 信頼性 ランキング</span><span class="volbadge-tip__vol">33</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ個人輸入 おすすめ</span><span class="volbadge-tip__vol">23</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 歴史</span><span class="volbadge-tip__vol">20</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントを利用する場合の注意点</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントと健康</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">トクホ危険性</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 危険性 小林製薬</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント信頼 性</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">supplement sale</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ メーカー 信頼 性 ランキング 海外</span><span class="volbadge-tip__vol">10</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養指導の意義 目的 サプリメント</span><span class="volbadge-tip__vol">6</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 正しい利用法</span><span class="volbadge-tip__vol">6</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 上手に活用するには</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">日本のサプリメントの現状</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養 サプリメント メリット デメリット</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 現状</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリのメリット デメリット</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 利用状況</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">安全 な サプリメント メーカー 海外</span><span class="volbadge-tip__vol"></span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">海外アスリート サプリメント</span><span class="volbadge-tip__vol"></span></span></span></span></span></div><div class="persona-card__meta"><span>クラスターの性格 <b>リスク回避型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このクラスターを検索する人たち<span class="persona-subhead__badge">検索データに基づく推論</span></div><div class="persona-who"><div class="persona-who__text">副作用や過剰摂取、特定企業の問題を思い浮かべながら「飲んでも大丈夫か」を確かめようとする人たちです。国内製品の安全性の確認は、海外製品の信頼度や購入経路の点検へもつながっていきます。</div></div></div><div class="persona-card__body"><div class="persona-subhead">ハブ（代表）キーワード</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">ハブ（代表）キーワード</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 危険性</span><span class="persona-kbf__kw">サプリメント 海外</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合的な結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">安全に関するクエリは否定形で入ってくるため、リスクを避ける表現よりも、成分別の上限量や併用の注意を明記する情報のほうが信頼を生みます。原料の出所と製造管理の情報を表に出すことが、この群の不安に直接応えます。</div></div><div class="persona-subhead">このクラスターの代表キーワード<span class="persona-ev-note">月間検索数ベース</span></div><div class="persona-ev"><span class="persona-ev__item">アイハーブ怪しい<span class="persona-ev__vol">1,600</span></span><span class="persona-ev__item">飲むと やばい サプリ 一覧dhc<span class="persona-ev__vol">1,206</span></span><span class="persona-ev__item">サプリメント 海外<span class="persona-ev__vol">826</span></span><span class="persona-ev__item">サプリメント 危険性<span class="persona-ev__vol">730</span></span><span class="persona-ev__item">iherb サプリメント<span class="persona-ev__vol">720</span></span><span class="persona-ev__item">サプリメント飲まない方が良い<span class="persona-ev__vol">590</span></span><span class="persona-ev__item">飲ん では いけない サプリメント<span class="persona-ev__vol">420</span></span><span class="persona-ev__item">海外 ダイエットサプリ 激やせランキング<span class="persona-ev__vol">320</span></span><span class="persona-ev__item persona-ev__more">ほか 38件</span></div></div></div><div class="dash-card cl-section"><div class="dash-card__head"><span class="dash-card__title">ハブキーワード一覧</span></div><p class="persona-section-desc">各検索目的クラスターの代表（ハブ）キーワードです。ハブは一緒に検索される関係がもっとも多い中心キーワードで、そのクラスターを代表します。</p><div class="dash-card__body"><div class="cl-hubtable-wrap"><table class="cl-hubtable"><thead><tr><th>検索目的クラスター</th><th>クラスター</th><th>代表（ハブ）キーワード</th></tr></thead><tbody><tr><td class="cl-hubtable__group">種類・成分・効果の確認</td><td class="cl-hubtable__clusters">G, I, D</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメント効果一覧</span><span class="cl-hub-chip">サプリメント 栄養素</span><span class="cl-hub-chip">サプリメントの効果</span></td></tr><tr><td class="cl-hubtable__group">条件別のおすすめ・ブランドラインナップ探索</td><td class="cl-hubtable__clusters">B, L</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメントおすすめ</span><span class="cl-hub-chip">サプリメント dhc</span></td></tr><tr><td class="cl-hubtable__group">用語・剤形の理解とサプライチェーン調査</td><td class="cl-hubtable__clusters">A, H, C, M</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメント</span><span class="cl-hub-chip">サプリメント英語</span><span class="cl-hub-chip">サプリメント メーカー</span><span class="cl-hub-chip">サプリ lp</span></td></tr><tr><td class="cl-hubtable__group">飲むタイミング・継続の管理</td><td class="cl-hubtable__clusters">K, F</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメント 飲むタイミング</span><span class="cl-hub-chip">サプリめんどくさい</span></td></tr><tr><td class="cl-hubtable__group">安全性・信頼性の点検</td><td class="cl-hubtable__clusters">E, J</td><td class="cl-hubtable__hub"><span class="cl-hub-chip">サプリメント 危険性</span><span class="cl-hub-chip">サプリメント 海外</span></td></tr></tbody></table></div></div></div><div class="dash-card cl-section"><div class="dash-card__head"><span class="dash-card__title">検索の流れ (From → To)</span></div><p class="persona-section-desc">ハブキーワードを起点に関心が移動していく代表的な経路です。あるクラスターから別のクラスターへつながる探索の流れを示します。</p><div class="dash-card__body cl-flows"><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメント</span><span class="cl-flow__meta">月間検索数 31,566 · 接続クラスター 13個 · 総称での探索 → 条件別の絞り込み</span></div><div class="cl-flow__path"><span class="cl-flow__node">A · サプリメント</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">B · サプリメントおすすめ</span></div><div class="cl-flow__insight">カテゴリ全体を見渡す段階では、まだ自分の条件が定まっていません。年代・性別・目的という軸に出会った瞬間におすすめクエリへ移り、候補が一気に絞られます。</div></div><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメントおすすめ</span><span class="cl-flow__meta">月間検索数 31,566 · 接続クラスター 5個 · おすすめの受け取り → 効果の再検証</span></div><div class="cl-flow__path"><span class="cl-flow__node">B · サプリメントおすすめ</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">D · サプリメントの効果</span></div><div class="cl-flow__insight">おすすめ一覧を見たあと、すぐには買わずに、その推奨が本当に正しいのかを問い直す段階へ進みます。効果やランキングと突き合わせる動きであり、おすすめコンテンツだけでは転換が完結しません。</div></div><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメント効果一覧</span><span class="cl-flow__meta">月間検索数 633 · 接続クラスター 8個 · 成分の理解 → リスクの確認</span></div><div class="cl-flow__path"><span class="cl-flow__node">G · サプリメント効果一覧</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">E · サプリメント 危険性</span></div><div class="cl-flow__insight">成分と効果を把握するほど、過剰摂取や副作用という反対側の問いがついてきます。効果の説明と注意事項が分かれていると、この地点で離脱が起きます。</div></div><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメント dhc</span><span class="cl-flow__meta">月間検索数 31,100 · 接続クラスター 5個 · ブランドの確定 → 飲用の実行</span></div><div class="cl-flow__path"><span class="cl-flow__node">L · サプリメント dhc</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">K · サプリメント 飲むタイミング</span></div><div class="cl-flow__insight">特定ブランドの製品に絞り込まれたあとは、関心が「どう飲むか」へ移ります。購入直後の飲み方案内が、ブランド体験の延長線上に置かれる区間です。</div></div><div class="cl-flow"><div class="cl-flow__head"><span class="cl-flow__hub">サプリメント 危険性</span><span class="cl-flow__meta">月間検索数 730 · 接続クラスター 6個 · 安全への不安 → 供給元の再点検</span></div><div class="cl-flow__path"><span class="cl-flow__node">E · サプリメント 危険性</span><span class="cl-flow__arrow">→</span><span class="cl-flow__node">J · サプリメント 海外</span></div><div class="cl-flow__insight">安全性への疑いが生まれると、製品そのものよりも、どこで作りどこで買うのかへ関心が移ります。海外の個人輸入やメーカーの信頼度確認が、同じ不安の延長として現れます。</div></div></div></div><div class="a4-prose">日本のサプリメント市場の検索地形では、「選ぶ軸」と「疑う軸」が同時に働いています。条件別のおすすめとブランドのラインナップが需要を集める一方で、その直後に効果と安全性を問い直す群への移動が起こり、おすすめだけでは結論に至りません。購入後は飲むタイミングと継続の管理が別の大きな群を形づくっており、リピートの接点が購入前ではなく使用の局面に置かれていることを示しています。</div><div class="persona-subhead">主要インサイト</div><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>おすすめの次には必ず検証が来る</div><div class="rpt-act-card__body">おすすめの群から効果・ランキングの群へ向かうつながりが実在します。おすすめコンテンツを終着点として設計すると、検証の段階を競合のページに渡すことになります。</div></div><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>効果の説明とリスク情報は一体である</div><div class="rpt-act-card__body">成分と効果をまとめた群が、過剰摂取・副作用の群と直接つながっています。この二つの情報がサイト構造上で分かれていると、この転換点で離脱が生じます。</div></div><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>飲用の局面が独立した需要をつくる</div><div class="rpt-act-card__body">いつ飲むか、何と一緒に飲むかを問う群が独立して存在し、続かない悩みや保管の悩みが同じ場所にまとまっています。購入後のコミュニケーションが事実上もう一つの検索市場です。</div></div></div><div class="persona-subhead">いますぐ試せること</div><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>おすすめページに根拠のブロックを添える</div><div class="rpt-act-card__body">年代・性別・目的別のおすすめの下に成分の根拠と限界を併記し、検証クエリがサイト内で解消されるようにします。</div></div><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>成分別の飲むタイミングガイドをつくる</div><div class="rpt-act-card__body">鉄・亜鉛・葉酸のようにタイミングのクエリがつく成分を基準に案内を整理し、製品ページから直接たどり着けるようにします。</div></div><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>安全情報を避けずに表に出す</div><div class="rpt-act-card__body">上限量や併用の注意、原料・製造管理の情報を製品情報の前段に置き、否定形のクエリに正面から応えます。</div></div></div><div class="persona-subhead">これから注目したい機会</div><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>継続を助ける生活単位のコンテンツ</div><div class="rpt-act-card__body">小分け・持ち運び・保管のように継続の離脱を防ぐテーマは、まだブランドが積極的に扱っていない領域です。リピート率と直接つながる余地があります。</div></div><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>海外個人輸入の需要を引き戻す</div><div class="rpt-act-card__body">安全への不安が海外製品の信頼度調査へつながる経路が確認できます。国内製造・品質管理のメッセージでこの流れを引き戻す接点があります。</div></div><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>入門用語の検索を先取りする</div><div class="rpt-act-card__body">定義や剤形の違いを問うクエリは、購入前の最初の接触面です。ブランド色を抑えたやさしい説明が、長期的な入口になります。</div></div></div></div></div>
+    </div>
+  </div>
+
+  <script>
+(function(){
+  var tabs = document.querySelectorAll('.dash-tab');
+  var panels = document.querySelectorAll('.dash-tab-panel');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var idx = tab.getAttribute('data-panel');
+      tabs.forEach(function(t){
+        var on = t.getAttribute('data-panel') === idx;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      panels.forEach(function(p){
+        p.classList.toggle('active', p.getAttribute('data-panel') === idx);
+      });
+    });
+  });
+  var viewBtns = document.querySelectorAll('.mini-toolbar__view button');
+  viewBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mode = btn.getAttribute('data-view');
+      document.body.classList.toggle('view-mode-dash', mode === 'dash');
+      document.body.classList.toggle('view-mode-a4',   mode === 'a4');
+      viewBtns.forEach(function(b){ b.classList.toggle('active', b === btn); });
+    });
+  });
+
+  // 검색량 뱃지 — 클릭하면 키워드 목록(툴팁)을 토글. 마우스오버 시엔
+  // native title("클릭시 키워드 목록 확인")만 뜬다. X·바깥클릭으로 닫는다.
+  document.querySelectorAll('.persona-card__volbadge').forEach(function(badge){
+    var tip = badge.querySelector('.volbadge-tip');
+    var close = badge.querySelector('.volbadge-tip__close');
+    badge.addEventListener('click', function(e){
+      if (tip && tip.contains(e.target)) { e.stopPropagation(); return; }
+      e.stopPropagation();
+      badge.classList.toggle('tip-open');
+    });
+    badge.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); badge.classList.toggle('tip-open');
+      }
+    });
+    if (close) {
+      close.addEventListener('click', function(e){
+        e.stopPropagation(); e.preventDefault();
+        badge.classList.remove('tip-open');
+      });
+    }
+  });
+  document.addEventListener('click', function(){
+    document.querySelectorAll('.persona-card__volbadge.tip-open').forEach(function(b){
+      b.classList.remove('tip-open');
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1172 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>クエリ機会分析 · サプリメント</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>/* === design-tokens.css === */
+/**
+ * 디자인 시스템 - 일관된 CSS 규칙
+ * 타이포그래피, 색상, 간격, Border Radius, Border Width
+ */
+
+/* Font imports handled by globals.css */
+
+/* ========== CSS Custom Properties (Design Tokens) ========== */
+:root {
+  /* ----- Font Family ----- */
+  --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, Sans-serif;
+
+  /* ----- Typography (폰트 굵기 / 줄높이 / 크기) ----- */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+  --line-height-snug: 1.3;
+  --line-height-normal: 1.5;
+  --line-height-tight: 1.4;
+  --font-size-display: 48px;  /* Display */
+  --font-size-headline1: 32px;
+  --font-size-headline2: 28px;
+  --font-size-headline3: 24px;
+  --font-size-headline4: 20px;
+  --font-size-headline5: 18px;
+  --font-size-b1: 16px;
+  --font-size-b2: 14px;
+  --font-size-b3: 13px;
+  --font-size-b4: 12px;
+  --font-size-cap: 11px;      /* Cap */
+
+  /* ----- Brand Colors ----- */
+  --brand-coral-lightest: #FFF0F6;
+  --brand-coral-main:     #FF247A;   /* LM Coral Pink  PANTONE 2039C */
+  --brand-coral-darker:   #A81650;
+
+  --brand-magenta-lightest: #F8E6F4;
+  --brand-magenta-main:     #CD3197;  /* LM Magenta  PANTONE 3527C */
+  --brand-magenta-darker:   #821E60;
+
+  --brand-purple-lightest: #FEF9FF;
+  --brand-purple-lighter:  #F5E6FA;
+  --brand-purple-main:     #AA18CC;  /* LM Purple  PANTONE 254C */
+  --brand-purple-darker:   #7A1194;
+
+  --brand-violet-lightest: #EDE6FF;
+  --brand-violet-main:     #7F18FF;  /* LM Violet  PANTONE 2091C */
+  --brand-violet-darker:   #5A10B8;
+
+  --brand-gradient: linear-gradient(135deg, #FF247A 0%, #CD3197 100%);
+
+  /* ----- Grayscale (블루그레이) ----- */
+  --white: #FFFFFF;
+  --gray-50: #F9FAFB;
+  --gray-100: #F7F8FA;
+  --gray-200: #E3E8F2;
+  --gray-300: #D1D9E6;
+  --gray-400: #AAB4C4;
+  --gray-500: #7A8699;
+  --gray-600: #586882;
+  --gray-700: #3B4A60;
+  --gray-800: #1E2A3A;
+  --gray-900: #101828;
+  --black: #000000;
+
+  /* ----- System Colors ----- */
+  /* PayPal (DEPRECATED — 정리 Phase에서 결제 페이지 sync 후 일괄 제거) */
+  --paypal-primary: #0070ba;
+  --paypal-primary-dark: #005ea6;
+  --paypal-logo-light: #c2e0f4;
+
+  --success-light: #EDF9F6;
+  --success-main: #1ABC9C;
+  --success-dark: #148F77;
+  --error-lightest: #FFF0F6;
+  --error-lighter:  #FFF0F6;
+  --error-light:    #FFAED0;
+  --error-main:     var(--brand-coral-main);
+  --error-dark:     var(--brand-coral-darker);
+  --error-darker:   #7A0F38;
+  --warning-lighter: #FFFBE6;
+  --warning-main: #FBBD08;
+  --warning-dark: #8A6600;
+
+  /* ----- Overlay Colors (반투명 레이어용 — rgba 직접 사용 금지) ----- */
+  --overlay-dark-72: rgba(16, 24, 40, 0.72);    /* gray-900@72% — 미디어 그라디언트 */
+  --overlay-dark-0: rgba(16, 24, 40, 0);         /* gray-900@0%  — 그라디언트 끝 투명 */
+  --overlay-white-82: rgba(255, 255, 255, 0.82); /* white@82%   — 히어로 설명 텍스트 */
+  --overlay-white-25: rgba(255, 255, 255, 0.25); /* white@25%   — 미디어 카드 버튼 hover */
+  --overlay-backdrop: rgba(16, 24, 40, 0.45);    /* gray-900@45% — 모바일 사이드바 백드롭 */
+
+  /* ----- Layout Tokens (컴포넌트 치수 — 8px 그리드 외 설계 고정값) ----- */
+  --sidebar-width: 280px;
+  --sidebar-width-collapsed: 53px;
+  --process-panel-width: 320px;
+  --process-panel-width-desktop: 420px;
+  --page-header-height: 56px;
+  --wizard-tab-bar-height: 48px; /* 모바일 setup wizard 탭바 높이 */
+  /*
+   * 본문 min-height(calc(100vh − 헤더 − 아래 값))용 푸터 예약 높이(대략값).
+   * 런타임에 SiteFooter(shared/layout/SiteFooter.tsx)가 실제 offsetHeight 를 측정해 덮어씀.
+   * 아래 정적 값은 SSR / 측정 전 fallback.
+   */
+  --site-footer-reserved-height: 180px;
+  --site-footer-compact-reserved-height: 72px;
+  --settings-bar-height: calc(var(--spacing-5xl) - var(--spacing-2xs)); /* 46px */
+  --btn-height-xl: 52px;
+  --process-panel-action-bar-height: 56px;
+  --process-panel-sheet-height: 65vh;
+
+  /* ----- Spacing (8px 기반) ----- */
+  --spacing-none: 0;
+  --spacing-3xs: 1px;      /* 0.0625rem */
+  --spacing-2xs: 2px;      /* 0.125rem */
+  --spacing-xs: 4px;       /* 0.25rem */
+  --spacing-sm: 8px;       /* 0.5rem */
+  --spacing-md: 12px;      /* 0.75rem */
+  --spacing-lg: 16px;      /* 1rem */
+  --spacing-xl: 20px;      /* 1.25rem */
+  --spacing-2xl: 24px;     /* 1.5rem */
+  --spacing-3xl: 32px;     /* 2rem */
+  --spacing-4xl: 40px;     /* 2.5rem */
+  --spacing-5xl: 48px;     /* 3rem */
+  --spacing-6xl: 64px;     /* 4rem */
+  --spacing-7xl: 80px;     /* 5rem */
+  --spacing-8xl: 96px;     /* 6rem */
+  --spacing-9xl: 112px;    /* 7rem */
+
+  /* ----- Border Radius ----- */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* ----- Border Width ----- */
+  --border-none: 0;
+  --border-thin: 1px;           /* 0.0625rem */
+  --border-default: 2px;        /* 0.125rem */
+  --border-thick: 3px;          /* 0.1875rem */
+  --border-extra-thick: 4px;    /* 0.25rem */
+
+  /* ----- Transition ----- */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.35s ease;
+
+  /* ----- Z-Index Scale ----- */
+  --z-base: 1;
+  --z-header: 10;
+  --z-sidebar: 100;
+  --z-dropdown: 200;
+  --z-backdrop: 290;
+  --z-sidebar-mobile: 300; /* 모바일 오버레이 사이드바 — 백드롭(290) 위에 위치 */
+  --z-process-sheet: 310;
+  --z-modal: 500;
+  --z-modal-dropdown: 600;
+  --z-toast: 700;
+
+  /* ----- Breakpoints (media query 기준값 — CSS 변수 미지원, 숫자 그대로 사용)
+     Mobile : max-width 767px
+     Tablet : 768px ~ 1279px
+     Desktop: min-width 1280px
+  ----- */
+
+  /* ----- Shadow (Figma Shadow Scale 참조) ----- */
+  /* 중요도·계층에 맞게 적용. 색상: gray-800 기반 rgba */
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px rgba(30, 42, 58, 0.04);                                    /* 미세한 깊이감, 구분선 */
+  --shadow-sm: 0 1px 3px rgba(30, 42, 58, 0.06), 0 1px 2px rgba(30, 42, 58, 0.04);  /* 미세한 깊이감, 구분선 */
+  --shadow-md: 0 4px 6px -1px rgba(30, 42, 58, 0.08), 0 2px 4px -2px rgba(30, 42, 58, 0.05);  /* 카드, 드롭다운 */
+  --shadow-lg: 0 10px 15px -3px rgba(30, 42, 58, 0.08), 0 4px 6px -4px rgba(30, 42, 58, 0.05); /* 모달, 팝오버 */
+  --shadow-xl: 0 20px 25px -5px rgba(30, 42, 58, 0.1), 0 8px 10px -6px rgba(30, 42, 58, 0.06); /* 다이얼로그, 드로어 */
+  --shadow-2xl: 0 25px 50px -12px rgba(30, 42, 58, 0.15);                            /* 최상위 레이어 */
+}
+
+html[lang="en"] {
+  --font-family: var(--font-noto-sans, 'Noto Sans'), -apple-system, BlinkMacSystemFont, Sans-serif;
+}
+
+html[lang="ja"] {
+  --font-family: var(--font-noto-sans-jp, 'Noto Sans JP'), -apple-system, BlinkMacSystemFont, Sans-serif;
+}
+
+/* ========== Base / Reset ----- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible { outline: 2px solid var(--gray-400); outline-offset: 2px; }
+
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-b1);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--gray-900);
+  background-color: var(--white);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== Border Radius Utility Classes ----- */
+.radius-none   { border-radius: var(--radius-none); }
+.radius-sm     { border-radius: var(--radius-sm); }
+.radius-md     { border-radius: var(--radius-md); }
+.radius-lg     { border-radius: var(--radius-lg); }
+.radius-xl     { border-radius: var(--radius-xl); }
+.radius-2xl    { border-radius: var(--radius-2xl); }
+.radius-full   { border-radius: var(--radius-full); }
+
+/* ========== Border Width Utility Classes ----- */
+.border-none         { border-width: var(--border-none); }
+
+
+/* ========== Color Utility Classes (배경/텍스트) ----- */
+.bg-white       { background-color: var(--white); }
+.text-disabled  { color: var(--gray-500); }
+.text-error     { color: var(--error-main); }
+
+/* ========== Global Scrollbar ========== */
+* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.is-scrolling { scrollbar-color: var(--gray-300) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: transparent; border-radius: var(--radius-sm); }
+.is-scrolling::-webkit-scrollbar-thumb { background: var(--gray-300); }
+
+/* ========== Scroll Utilities ========== */
+.scroll-y { overflow-y: auto; }
+.scroll   { overflow: auto; }
+
+
+
+/* === report-shell.css === */
+/* =====================================================================
+   report-shell.css
+   리포트 공통 레이아웃 / 툴바 / 뷰 전환 / 대시보드 / A4 뷰 / 인쇄
+   의존: design-system.css
+   6개 에이전트 공용: audience-analysis, brand-context, market-synthesis,
+                      brand-share, decision-factors, trend-analysis
+   ===================================================================== */
+
+/* ===== Main Layout ===== */
+.rpt-main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  height: 100vh; /* fallback: dvh 미지원 브라우저 */
+  height: 100dvh; /* 모바일 툴바에 하단 콘텐츠 가려지는 문제 해결 */
+  overflow: hidden;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar--collapsed ~ .rpt-main { margin-left: var(--sidebar-width-collapsed); }
+
+/* ===== Toolbar ===== */
+.rpt-toolbar {
+  position: sticky; top: 0;
+  height: 56px; z-index: 200; flex-shrink: 0;
+  background: var(--white);
+  border-bottom: var(--border-thin) solid var(--gray-200);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--spacing-2xl);
+  gap: var(--spacing-lg);
+  box-shadow: var(--shadow-xs);
+}
+.rpt-toolbar__left  { display: flex; align-items: center; gap: var(--spacing-md); min-width: 0; flex: 1; }
+.rpt-toolbar__right { display: flex; align-items: center; gap: var(--spacing-sm); flex: 1; justify-content: flex-end; }
+
+.rpt-product-badge {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  min-width: 0; flex: 1;
+  font-size: var(--font-size-b2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-900);
+}
+.rpt-product-badge__label { flex-shrink: 0; }
+.rpt-product-badge__sep { color: var(--gray-300); flex-shrink: 0; }
+.rpt-product-badge__text {
+  min-width: 0; flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-weight: var(--font-weight-regular);
+  color: var(--gray-500);
+}
+
+/* ===== View Toggle ===== */
+.view-toggle {
+  display: flex;
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-md); overflow: hidden;
+}
+.view-toggle-btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: none; background: none; cursor: pointer;
+  font-family: var(--font-family);
+  font-size: var(--font-size-b4);
+  font-weight: var(--font-weight-medium);
+  color: var(--gray-500);
+  display: flex; align-items: center; gap: 5px;
+  transition: background 0.15s, color 0.15s;
+}
+.view-toggle-btn.active { background: var(--gray-800); color: var(--white); }
+.view-toggle-btn:not(.active):hover { background: var(--gray-100); color: var(--gray-700); }
+
+/* ===== Print Button ===== */
+.rpt-print-btn {
+  display: inline-flex; align-items: center; gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: none; cursor: pointer;
+  font-family: var(--font-family);
+  font-size: var(--font-size-b3);
+  font-weight: var(--font-weight-medium);
+  color: var(--gray-600);
+  transition: background 0.15s;
+}
+.rpt-print-btn:hover { background: var(--gray-100); }
+
+/* ===== Dashboard View ===== */
+.view-dash { flex: 1; overflow-y: auto; background: var(--gray-100); position: relative; min-height: 0; }
+
+/* view-dash 안 footer: view-dash 배경(gray-100)과 일체화 */
+.view-dash .site-footer {
+  background: transparent !important;
+}
+.dash-scroll {
+  max-width: 1024px; margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-2xl) var(--spacing-7xl);
+  display: flex; flex-direction: column; gap: 0;
+}
+
+/* ===== Dashboard Cover (listeningmind-ai-design report-components.css 동일) ===== */
+.dash-cover-block { flex-shrink: 0; margin-bottom: var(--spacing-lg); }
+.dash-cover-gradient {
+  background: linear-gradient(135deg, rgb(10, 5, 16) 0%, rgb(26, 8, 48) 50%, rgb(13, 21, 40) 100%);
+  padding: 22px 28px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.dash-cover-gradient::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -30px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(170, 24, 204, 0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dash-cover-gradient::after {
+  content: "";
+  position: absolute;
+  bottom: -30px;
+  left: 35%;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(255, 36, 122, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dash-cover-eyebrow {
+  font-size: 11px; font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 6px;
+  position: relative;
+}
+.dash-cover-title    { font-size: 20px; font-weight: 700; color: white; line-height: 1.35; margin-bottom: 8px; position: relative; }
+.dash-cover-category { font-size: 13px; color: rgba(255, 255, 255, 0.55); position: relative; }
+.dash-cover-meta     { font-size: 11px; color: rgba(255, 255, 255, 0.35); margin-top: 12px; position: relative; }
+
+/* ===== Dashboard Tabs ===== */
+.dash-tabs {
+  position: sticky; top: 0; z-index: 60;
+  margin: 0 calc(-1 * var(--spacing-2xl)) var(--spacing-lg);
+  padding: 0 var(--spacing-2xl);
+  background: var(--gray-100);
+  border-bottom: var(--border-thin) solid var(--gray-200);
+  box-shadow: 0 1px 0 rgba(16,24,40,0.04);
+}
+.dash-tabs__inner { display: flex; gap: 2px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.dash-tabs__inner::-webkit-scrollbar { display: none; }
+.dash-tab {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: var(--spacing-xs);
+  padding: var(--spacing-md); border: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  background: transparent; cursor: pointer;
+  font-family: var(--font-family); font-size: var(--font-size-b3);
+  font-weight: var(--font-weight-semibold); color: var(--gray-600);
+  transition: color 0.15s, border-color 0.15s; white-space: nowrap;
+}
+.dash-tab:hover  { color: var(--gray-900); }
+.dash-tab.active { color: var(--gray-800); border-bottom-color: var(--gray-800); }
+.dash-tab-panel        { display: none; animation: mrTabIn 0.22s ease; }
+.dash-tab-panel.active { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+@keyframes mrTabIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ===== Dashboard Card ===== */
+.dash-card {
+  background: var(--white);
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs); overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+.dash-card__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: var(--border-thin) solid var(--gray-100);
+}
+.dash-card__title    { font-size: var(--font-size-b2); font-weight: var(--font-weight-bold); color: var(--gray-900); }
+.dash-card__subtitle { font-size: var(--font-size-b4); font-weight: var(--font-weight-medium); color: var(--gray-500); margin-left: var(--spacing-sm); }
+.dash-card__badge    { font-size: var(--font-size-b4); color: var(--gray-500); background: var(--gray-100); padding: 2px 8px; border-radius: var(--radius-full); font-weight: var(--font-weight-medium); }
+.dash-card__body     { padding: var(--spacing-lg) var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); }
+
+/* Dashboard readability overrides */
+.view-dash .dash-scroll      { font-size: var(--font-size-b2); line-height: var(--line-height-normal); }
+.view-dash .dash-card__title { font-size: var(--font-size-b1); }
+
+/* ===== Loading / Error Overlay ===== */
+@keyframes pipeline-spin { to { transform: rotate(360deg); } }
+.pipeline-loading {
+  position: absolute; inset: 0; z-index: 100;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; font-family: inherit;
+}
+.pipeline-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--gray-200); border-top-color: var(--gray-800);
+  border-radius: 50%; animation: pipeline-spin .8s linear infinite;
+}
+.pipeline-msg       { font-size: 14px; color: var(--gray-600); text-align: center; }
+.pipeline-error-msg { font-size: 14px; color: var(--error-main); text-align: center; max-width: 400px; }
+.pipeline-error-title {
+  font-size: var(--font-size-b1);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-900);
+  text-align: center;
+  margin: 0 0 8px;
+}
+.pipeline-error-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 480px;
+  padding: 0 16px;
+}
+.pipeline-loading--error { gap: 8px; }
+.pipeline-retry-btn {
+  margin-top: 12px; padding: 8px 20px;
+  border: var(--border-thin) solid var(--gray-300); border-radius: var(--radius-md);
+  background: var(--white); cursor: pointer; font-size: 13px; font-family: inherit;
+}
+.pipeline-retry-btn:hover { background: var(--gray-100); }
+
+/* ===== A4 View ===== */
+.view-a4  { flex: 1; overflow-y: auto; background: var(--gray-200); min-height: 0; }
+.a4-scroll { padding: var(--spacing-4xl) var(--spacing-2xl) var(--spacing-7xl); }
+.rpt-page {
+  width: 794px; height: 1123px; background: var(--white);
+  box-shadow: 0 2px 16px rgba(16,24,40,0.10), 0 0 0 1px rgba(16,24,40,0.04);
+  margin: 0 auto var(--spacing-4xl); position: relative;
+  display: flex; flex-direction: column;
+}
+.rpt-page > .page-body { flex: 1; }
+.page-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 40px 12px;
+  border-bottom: var(--border-thin) solid var(--gray-200);
+}
+.page-hd__brand  { font-size: 10px; font-weight: var(--font-weight-black); color: var(--gray-800); letter-spacing: 0.08em; text-transform: uppercase; }
+.page-hd__report { font-size: 10px; color: var(--gray-400); }
+.page-hd__num    { font-size: 10px; color: var(--gray-400); }
+.page-body       { padding: 32px 40px 36px; display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+/* ===== Section Header ===== */
+.sec-hd { margin-bottom: 20px; }
+.view-a4 .sec-hd { margin-top: 48px; }
+.view-a4 .page-body > .sec-hd:first-child { margin-top: 0; }
+.sec-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sec-eyebrow__line { width: 20px; height: 2px; background: var(--gray-800); flex-shrink: 0; }
+.sec-eyebrow__text { font-size: 10px; font-weight: var(--font-weight-bold); color: var(--gray-800); text-transform: uppercase; letter-spacing: 0.12em; }
+.sec-title { font-size: 22px; font-weight: var(--font-weight-black); color: var(--gray-900); line-height: var(--line-height-snug); margin-bottom: 6px; }
+.sec-desc  { font-size: var(--font-size-b3); color: var(--gray-500); line-height: var(--line-height-normal); }
+
+/* ===== Cover ===== */
+.rpt-page--cover { height: 1123px; display: flex; flex-direction: column; }
+.cover-body {
+  background: linear-gradient(135deg, #001233 0%, var(--gray-800) 55%, var(--gray-700) 100%);
+  padding: 52px 48px 44px; flex: 1;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.cover-body::before {
+  content: ''; position: absolute;
+  top: -80px; right: -60px; width: 280px; height: 280px;
+  border-radius: 50%; background: rgba(122, 172, 246, 0.08);
+}
+.cover-lm { font-size: 11px; font-weight: var(--font-weight-black); color: var(--gray-300); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: var(--spacing-3xl); position: relative; z-index: 1; }
+.cover-type-label { font-size: var(--font-size-b3); font-weight: var(--font-weight-medium); color: rgba(255,255,255,0.5); margin-bottom: 8px; position: relative; z-index: 1; }
+.cover-title { font-size: 42px; font-weight: var(--font-weight-black); color: var(--white); line-height: 1.1; margin-bottom: 10px; position: relative; z-index: 1; }
+.cover-category { font-size: var(--font-size-b2); color: rgba(255,255,255,0.65); margin-bottom: var(--spacing-2xl); position: relative; z-index: 1; max-width: 500px; line-height: 1.7; }
+.cover-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 11px; color: rgba(255,255,255,0.45); position: relative; z-index: 1; }
+.cover-meta-sep { opacity: 0.4; }
+.cover-footer { background: rgba(16,24,40,0.35); padding: 12px 48px; display: flex; align-items: center; justify-content: space-between; }
+.cover-footer__text { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+/* A4 view shell overrides */
+.view-a4 .sec-hd   { margin-bottom: var(--spacing-md); }
+.view-a4 .dash-card { margin-bottom: var(--spacing-md); }
+
+/* A4 Prose */
+.a4-prose { font-size: var(--font-size-b2); line-height: 1.8; color: var(--gray-700); }
+.a4-prose p + p { margin-top: var(--spacing-md); }
+
+/* 모바일 전용 헤더 (데스크톱에서 숨김) */
+.rpt-mobile-header {
+  display: none;
+}
+
+/* ===== Responsive: Mobile (<768px) ===== */
+@media (max-width: 767px) {
+  .rpt-main,
+  .sidebar--collapsed ~ .rpt-main {
+    margin-left: 0;
+  }
+
+  /* 모바일 헤더 표시 */
+  .rpt-mobile-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--white);
+    border-bottom: var(--border-thin) solid var(--gray-200);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .rpt-mobile-header__title {
+    font-size: var(--font-size-b1);
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-900);
+  }
+  
+  /* 기존 툴바 숨김 */
+  .rpt-toolbar {
+    display: none !important;
+  }
+}
+
+/* ===== Responsive: Small Mobile (≤480px) ===== */
+@media (max-width: 480px) {
+  .rpt-toolbar {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .view-toggle-btn span:not(.sr-only),
+  .rpt-print-btn span:not(.sr-only) {
+    display: none;
+  }
+  
+  .view-toggle-btn svg,
+  .rpt-print-btn svg {
+    margin: 0;
+  }
+  
+  .rpt-product-badge__text {
+    font-size: var(--font-size-b4);
+  }
+}
+
+/* ===== Print ===== */
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { display: block !important; height: auto !important; overflow: visible !important; background: white !important; }
+  .sidebar, .rpt-toolbar { display: none !important; }
+  .rpt-main  { display: block !important; margin-left: 0 !important; height: auto !important; overflow: visible !important; }
+  .view-dash { display: none !important; }
+  .view-a4   { display: block !important; flex: none !important; height: auto !important; overflow: visible !important; background: white !important; }
+  .a4-scroll { padding: 0 !important; }
+  .rpt-page  { width: 210mm !important; height: auto !important; overflow: visible !important; box-shadow: none !important; margin: 0 !important; break-after: page; page-break-after: always; }
+  .rpt-page--cover { height: 297mm !important; }
+  .rpt-page:last-child { break-after: auto !important; page-break-after: auto !important; }
+  .pp-card   { break-inside: avoid; page-break-inside: avoid; }
+  .type-card { break-inside: avoid; page-break-inside: avoid; }
+  .action-card { break-inside: avoid; page-break-inside: avoid; }
+}
+
+
+/* === audience-shared.css === */
+/* =====================================================================
+   audience-shared.css
+   ListeningMind.AI audience-analysis.css 에서 .mr-summary-box* 만 발췌.
+   ReportPurposeBox 가 사용하는 공통 스타일.
+   ===================================================================== */
+
+.mr-summary-box {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--gray-100);
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+.mr-summary-box--dash { padding: 20px 24px; margin: 0; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+.mr-summary-box--insight {
+  background: var(--gray-100);
+  border: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 16px 20px;
+  margin: 0;
+}
+.mr-summary-box--insight .mr-summary-box__title { color: var(--gray-800); }
+.mr-summary-box__title {
+  font-size: var(--font-size-cap); font-weight: var(--font-weight-bold);
+  color: var(--gray-800);
+  letter-spacing: 0.08em; margin-bottom: var(--spacing-xs);
+}
+.mr-summary-box p    { font-size: var(--font-size-b3); line-height: 1.7; }
+.mr-summary-text     { font-size: 14px; line-height: 1.7; }
+.mr-summary-text--sm { font-size: 13px; line-height: 1.7; }
+
+/* A4 view 에서 mr-summary-box 의 radius 보강 (audience-analysis.css 의 .view-a4 override) */
+.view-a4 .mr-summary-box { border-radius: var(--radius-md); margin-bottom: var(--spacing-md); }
+
+
+/* === report-components.css === */
+/* =====================================================================
+   report-components.css
+   리포트 공용 컴포넌트 — 인사이트 박스 / 바 차트 / 액션 그리드
+   의존: design-system.css, report-shell.css
+   6개 에이전트 공용: audience-analysis, brand-context, market-synthesis,
+                      brand-share, decision-factors, trend-analysis
+   ===================================================================== */
+
+/* ===== Insight Box ===== */
+.insight-box { padding: var(--spacing-md) var(--spacing-lg); border-radius: var(--radius-md); margin-bottom: var(--spacing-lg); }
+.insight-box--primary { background: var(--white); border: var(--border-thin) solid var(--gray-200); }
+.insight-box__title { font-size: var(--font-size-b4); font-weight: var(--font-weight-bold); color: var(--gray-800); margin-bottom: var(--spacing-sm); }
+
+/* ===== Bar Chart ===== */
+.bar-chart { display: flex; flex-direction: column; gap: 7px; }
+.bar-row   { display: flex; align-items: center; gap: var(--spacing-sm); }
+.bar-row__label { width: 240px; font-size: var(--font-size-cap); color: var(--gray-700); flex-shrink: 0; line-height: var(--line-height-snug); display: flex; align-items: center; gap: var(--spacing-sm); }
+.bar-row__track { flex: 1; height: 20px; background: var(--gray-100); border-radius: var(--radius-sm); overflow: hidden; }
+.bar-row__fill {
+  height: 100%; border-radius: var(--radius-sm);
+  background: var(--gray-800);
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: var(--spacing-xs); min-width: var(--spacing-2xl);
+  font-size: var(--font-size-cap); font-weight: var(--font-weight-bold); color: var(--white);
+  transition: width 0.6s ease;
+}
+.bar-row__pct { font-size: var(--font-size-cap); color: var(--gray-500); width: 40px; text-align: right; flex-shrink: 0; }
+
+/* ===== Proportion Block (R2 시안 Z) ===== */
+.propblock { margin-bottom: var(--spacing-md); }
+.propblock__strip {
+  display: flex; height: 36px;
+  border-radius: var(--radius-md); overflow: hidden;
+  gap: 2px; margin-bottom: 14px;
+}
+.propblock__seg {
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--font-size-cap); font-weight: var(--font-weight-bold);
+  color: var(--white); overflow: hidden; white-space: nowrap; padding: 0 6px;
+}
+.propblock__legend {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px;
+}
+.propblock__item {
+  display: flex; align-items: flex-start; gap: 7px; min-height: 34px;
+}
+.propblock__dot {
+  width: 9px; height: 9px; border-radius: 2px;
+  flex-shrink: 0; margin-top: 3px;
+}
+.propblock__label {
+  flex: 1; font-size: var(--font-size-b4); color: var(--gray-700);
+  line-height: var(--line-height-snug);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.propblock__pct {
+  font-size: var(--font-size-b4); font-weight: var(--font-weight-bold);
+  color: var(--gray-700); white-space: nowrap; flex-shrink: 0; padding-top: 1px;
+}
+
+/* ===== Action Grid ===== */
+.action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
+.action-card { background: var(--white); border: var(--border-thin) solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; }
+.action-card__header { padding: var(--spacing-md) var(--spacing-xl); display: flex; align-items: center; gap: var(--spacing-sm); border-bottom: var(--border-thin) solid var(--gray-100); }
+.action-dot             { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.action-dot--now        { background: var(--gray-700); }
+.action-dot--future     { background: var(--brand-purple-main); }
+.action-card__title     { font-size: var(--font-size-b2); font-weight: var(--font-weight-bold); }
+.action-card__body      { padding: var(--spacing-lg) var(--spacing-xl); }
+.action-item            { margin-bottom: var(--spacing-md); }
+.action-item:last-child { margin-bottom: 0; }
+.action-item__title     { font-size: var(--font-size-b2); font-weight: var(--font-weight-medium); margin-bottom: var(--spacing-xs); }
+.action-item__desc      { font-size: var(--font-size-b3); line-height: 1.7; color: var(--gray-600); }
+.action-divider         { height: 1px; background: var(--gray-100); margin: var(--spacing-sm) 0; }
+
+/* Dashboard readability overrides */
+.view-dash .action-item__title { font-size: 14px; }
+.view-dash .action-item__desc  { font-size: 13px; }
+.view-dash .bar-row__label     { font-size: var(--font-size-b2); }
+
+/* A4 view overrides */
+.view-a4 .insight-box { margin-bottom: var(--spacing-md); }
+
+/* ===== Responsive: Mobile (≤767px) ===== */
+@media (max-width: 767px) {
+  .action-grid { grid-template-columns: 1fr; }
+  .change-grid { grid-template-columns: 1fr; }
+  .type-grid { grid-template-columns: 1fr; }
+  .br-card-grid { grid-template-columns: 1fr; }
+  .br-card__metrics { grid-template-columns: repeat(3, 1fr); }
+
+  /* bar-chart: 라벨 240px 고정 → grid 2열 (라벨+퍼센트 1행, 트랙 전체 2행) */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: var(--spacing-sm);
+    row-gap: var(--spacing-2xs);
+    align-items: center;
+  }
+  .bar-row__label { width: auto; grid-column: 1; grid-row: 1; }
+  .bar-row__pct   { width: auto; grid-column: 2; grid-row: 1; text-align: right; }
+  .bar-row__track { grid-column: 1 / -1; grid-row: 2; width: 100%; }
+
+  /* tr-card 모바일 간소화 */
+  .tr-card { padding: var(--spacing-md) var(--spacing-lg); }
+  .tr-card__header { flex-direction: column-reverse; gap: var(--spacing-2xs); }
+  .tr-card__signal { flex-direction: row; align-items: center; align-self: flex-end; gap: 0; }
+  .tr-card__signal .sig { display: none; }
+  .sig-txt { display: inline; }
+
+  /* propblock 모바일: 1열, 블록 높이 증가 */
+  .propblock__strip { height: 44px; }
+  .propblock__legend { grid-template-columns: 1fr; }
+  .propblock__item { min-height: 28px; }
+}
+
+/* ===== 데이터 부족 안내 (Report 패밀리 DATA_INSUFFICIENT) ===== */
+.pipeline-nodata {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--spacing-md); max-width: 460px; width: 100%;
+  padding: 0 var(--spacing-2xl); text-align: center;
+  margin: 0 auto var(--spacing-6xl);
+}
+.pipeline-nodata__icon {
+  width: var(--spacing-6xl); height: var(--spacing-6xl); border-radius: var(--radius-full);
+  background: var(--gray-100);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--spacing-xs);
+}
+.pipeline-nodata__title {
+  font-size: var(--font-size-headline5); font-weight: var(--font-weight-bold); color: var(--gray-900);
+  margin: 0; line-height: var(--line-height-tight);
+}
+.pipeline-nodata__desc {
+  font-size: var(--font-size-b2); color: var(--gray-500); line-height: var(--line-height-normal); margin: 0;
+}
+.pipeline-nodata__desc strong { color: var(--gray-700); font-weight: var(--font-weight-semibold); }
+.pipeline-nodata__hint {
+  background: var(--gray-50); border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-lg); padding: var(--spacing-md) var(--spacing-xl);
+  width: 100%; box-sizing: border-box; text-align: left;
+}
+.pipeline-nodata__hint-title {
+  font-size: var(--font-size-cap); font-weight: var(--font-weight-semibold); color: var(--gray-400);
+  letter-spacing: .04em; text-transform: uppercase; margin-bottom: var(--spacing-sm);
+}
+.pipeline-nodata__hint-row {
+  display: flex; align-items: center; gap: var(--spacing-sm);
+  font-size: var(--font-size-b3); margin-bottom: var(--spacing-sm);
+}
+.pipeline-nodata__hint-row:last-child { margin-bottom: 0; }
+.pipeline-nodata__badge--before {
+  padding: var(--spacing-2xs) var(--spacing-sm); border-radius: var(--radius-sm);
+  background: var(--gray-100); color: var(--gray-500);
+  font-size: var(--font-size-b4);
+}
+.pipeline-nodata__badge--after {
+  padding: var(--spacing-2xs) var(--spacing-sm); border-radius: var(--radius-sm);
+  background: var(--gray-100); color: var(--gray-800);
+  font-size: var(--font-size-b4); font-weight: var(--font-weight-semibold);
+}
+.pipeline-nodata__arrow { color: var(--gray-400); font-size: var(--font-size-b3); flex-shrink: 0; }
+.pipeline-nodata > .btn { margin-top: var(--spacing-lg); }
+
+
+/* === customer-analysis.css === */
+/*
+   customer-analysis.css
+   원본: listeningmind-ai-design/pages/agents/audience-analysis/run.html <style> 블록 (페르소나 카드)
+        + listeningmind-ai-design/styles/components/report-components.css:500-512 (.persona-card 컨테이너·번호)
+   의존: design-tokens.css (CSS 변수), audience-analysis.css (dash-* / rpt-* / cover-* 공통 레이아웃)
+
+   페르소나 카드 구조:
+     head (번호 · 이름 · 메타)
+     body × 3 (① WHO · ② KBF · ③ 종합결론 = 인사이트 + 근거 키워드)
+   세 묶음 모두 동일 클래스 .persona-card__body — 관리 일원화
+*/
+
+/* 페르소나 카드 컨테이너 — dash-card 베이스 위에 padding 분리 */
+.persona-card { padding: var(--spacing-xl); border-bottom: 1px solid var(--gray-100); }
+.persona-card:first-child { padding-top: var(--spacing-lg); }
+.persona-card:last-child { border-bottom: none; }
+
+.persona-card__head { padding: 0; border: none; }
+.persona-card__body { margin-top: var(--spacing-lg); margin-left: var(--spacing-5xl); padding-left: var(--spacing-sm); }
+/* 항목 간격은 페르소나 padding이 담당 → 컨테이너 gap 제거 */
+.persona-card .dash-card__body { gap: 0; }
+
+.persona-card__top { display: flex; gap: var(--spacing-lg); align-items: flex-start; }
+/* 카드 번호 (01, 02 ...) — 원본: report-components.css:506-508 */
+.persona-card__num { font-size: 28px; font-weight: 900; color: var(--gray-200); line-height: 1; flex-shrink: 0; min-width: 40px; text-align: right; letter-spacing: -0.02em; }
+/* 카드 헤더 메인 영역 (제목 + 메타) — 원본: report-components.css:510-512 */
+.persona-card__topmain { flex: 1; min-width: 0; }
+
+.persona-card__titlerow { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; min-height: 28px; }
+.persona-card__name { font-size: var(--font-size-b1); font-weight: 700; color: var(--gray-900); line-height: 1.35; }
+.persona-relbadge { font-size: var(--font-size-cap); font-weight: 600; color: var(--brand-magenta-darker); background: var(--brand-magenta-lightest); border-radius: var(--radius-sm); padding: 2px 7px; }
+.persona-card__meta { margin-top: var(--spacing-xs); display: flex; flex-wrap: wrap; gap: var(--spacing-xs) var(--spacing-lg); font-size: var(--font-size-b4); color: var(--gray-600); }
+.persona-card__meta b { color: var(--gray-800); font-weight: 600; }
+
+/* A4 뷰: 카드 분해 후 head 간격으로 카드 구분 */
+.view-a4 .persona-card__top { margin-top: var(--spacing-6xl); }
+
+.persona-section-desc { font-size: var(--font-size-b4); color: var(--gray-500); line-height: 1.5; margin: 0; padding: var(--spacing-md) var(--spacing-xl) 0; }
+
+/* 소제목 — 세 묶음 동일. ③ 묶음 내부 두 번째 subhead만 추가 간격 */
+.persona-subhead { font-size: var(--font-size-b4); font-weight: 700; color: var(--gray-500); margin: 0 0 var(--spacing-sm); display: flex; align-items: center; gap: var(--spacing-sm); }
+.persona-subhead__badge { font-size: 10px; font-weight: 600; color: var(--gray-500); background: var(--gray-100); border-radius: var(--radius-sm); padding: 1px 6px; letter-spacing: 0.02em; }
+.persona-insight + .persona-subhead { margin-top: var(--spacing-lg); }
+
+/* ① WHO — 박스 안에 [설명 + fields(하위 근거)] */
+.persona-who { background: var(--gray-50); border-radius: var(--radius-md); padding: var(--spacing-md) 14px; }
+.persona-who__text { font-size: var(--font-size-b4); color: var(--gray-800); line-height: 1.6; }
+.persona-fields { margin-top: var(--spacing-md); display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); }
+.persona-field { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: var(--spacing-md); }
+.persona-field__label { font-size: var(--font-size-cap); font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: var(--spacing-xs); }
+.persona-field__val { font-size: var(--font-size-b4); color: var(--gray-800); line-height: 1.5; }
+
+/* ② KBF — factor 제목 + 키워드 chip 배열 */
+.persona-kbf { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.persona-kbf__row { background: var(--gray-50); border-radius: var(--radius-md); padding: var(--spacing-md) 13px; }
+.persona-kbf__factor { font-size: var(--font-size-b3); font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs); }
+.persona-kbf__kws { display: flex; flex-wrap: wrap; gap: 5px; }
+.persona-kbf__kw { font-size: var(--font-size-cap); padding: 2px 7px; border-radius: var(--radius-sm); background: #fff; color: var(--gray-600); border: 1px solid var(--gray-200); }
+
+/* ③ 종합 결론 — insight 박스 (label + text) + 근거 키워드 chip */
+.persona-insight { border-left: 3px solid var(--brand-purple-main); background: var(--brand-purple-lightest); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: var(--spacing-md) 14px; }
+.persona-insight__label { font-size: var(--font-size-cap); font-weight: 700; color: var(--brand-purple-darker); margin-bottom: var(--spacing-xs); }
+.persona-insight__text { font-size: var(--font-size-b3); color: var(--gray-800); line-height: 1.55; }
+.persona-ev-note { font-size: var(--font-size-cap); font-weight: 400; color: var(--gray-400); margin-left: auto; }
+.persona-ev { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+.persona-ev__item { font-size: var(--font-size-cap); padding: 3px 9px; border-radius: var(--radius-sm); background: var(--gray-50); color: var(--gray-700); border: 1px solid var(--gray-200); display: inline-flex; gap: var(--spacing-sm); align-items: baseline; }
+.persona-ev__vol { font-size: 10px; color: var(--brand-purple-main); font-weight: 700; }
+
+@media (max-width: 640px) {
+  .persona-fields { grid-template-columns: 1fr; }
+  .persona-card__top { gap: var(--spacing-md); }
+  .persona-card__num { font-size: 20px; min-width: 28px; }
+  .persona-card__body { margin-left: 0; padding-left: 0; }
+}
+
+/* ───────────────────────────────────────────────
+   실행 제안 패널 — 액션 카드 (rpt-act-card)
+   원본: listeningmind-ai-design/styles/components/report-components.css:155-171
+   ─────────────────────────────────────────────── */
+.rpt-act-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.rpt-act-card { border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 13px 15px; background: #fff; }
+.rpt-act-card__title { font-size: var(--font-size-b3); font-weight: 700; color: var(--gray-900); margin-bottom: var(--spacing-xs); display: flex; align-items: center; gap: var(--spacing-sm); }
+.rpt-act-card__body { font-size: var(--font-size-b3); color: var(--gray-700); line-height: 1.55; }
+.rpt-act-empty { color: var(--gray-400); font-size: 12px; padding: var(--spacing-md); }
+
+/* action-dot 디자인 원본 크기로 정렬 (8px) — ListeningMind.AI 기본 10px 보다 작음 */
+.rpt-act-card .action-dot { width: 8px; height: 8px; }
+/* future 도트 색상 — 디자인은 회색 (gray-400) 이지만 ListeningMind.AI 는 보라색 유지 가능
+   디자인 기준: .action-dot--future { background: var(--gray-400); } */
+.rpt-act-card .action-dot--future { background: var(--gray-400); }
+/* query-opportunity 확장: #1958 ④ 세부 인사이트 카드 (총평/실행과 구분되는 마젠타 점) */
+.rpt-act-card .action-dot--insight { background: var(--brand-magenta-main); }
+/* evidence 캡 밖 키워드 안내 칩 */
+.persona-ev__more { color: var(--gray-500); font-style: normal; }
+
+/* 그룹 검색량 뱃지 마우스오버 툴팁 — 전체 member 키워드+검색량.
+   본문은 10행 높이로 고정, 초과분은 스크롤. 우상단 X 로 닫기(JS). */
+.persona-card__volbadge { position: relative; cursor: pointer; }
+.persona-card__volbadge .volbadge-tip {
+  display: none; position: absolute; top: 100%; left: 0; z-index: 30;
+  margin-top: 6px; min-width: 240px; max-width: 360px;
+  background: #fff; border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm); box-shadow: 0 6px 20px rgba(0,0,0,.14);
+  text-align: left; cursor: default; overflow: hidden;
+}
+/* 목록은 클릭으로 연다(tip-open). 마우스오버 시엔 native title 힌트만 뜬다. */
+.persona-card__volbadge.tip-open .volbadge-tip { display: block; }
+.volbadge-tip__head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--gray-100);
+  position: sticky; top: 0; background: #fff;
+}
+.volbadge-tip__title { font-size: 11px; font-weight: 700; color: var(--gray-900); }
+.volbadge-tip__close {
+  border: 0; background: transparent; color: var(--gray-500);
+  font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px; border-radius: 4px;
+}
+.volbadge-tip__close:hover { color: var(--gray-900); background: var(--gray-100); }
+/* 본문: 10행 높이(행 약 22px)로 고정, 초과분 스크롤.
+   span 은 기본 inline 이라 max-height 가 안 먹으므로 block 필수. */
+.volbadge-tip__body { display: block; max-height: 220px; overflow-y: auto; padding: 4px 0; }
+.volbadge-tip__row {
+  display: flex; justify-content: space-between; gap: 16px;
+  padding: 3px 12px; font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.volbadge-tip__kw { color: var(--gray-700); }
+.volbadge-tip__vol { color: var(--brand-purple-main); font-variant-numeric: tabular-nums; }
+/* 인쇄(A4)에서는 호버가 무의미하므로 툴팁 숨김 */
+@media print { .persona-card__volbadge .volbadge-tip { display: none !important; } }
+
+
+/* === overlay.css === */
+/* =====================================================================
+   overlay.css
+   스킬 전용 wrapper: 사이드바 없는 단독 HTML 환경에 맞춘 보정 +
+   뷰 토글(대시보드/A4) + 미니 툴바 + 인쇄 강제 A4 출력.
+   ===================================================================== */
+
+/* 단독 HTML — ListeningMind.AI 의 .rpt-main 사이드바 오프셋 제거.
+   페이지 전체를 채우도록 보정. */
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: var(--font-family);
+  background: var(--gray-100);
+  color: var(--gray-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 스크롤은 페이지 전체가 담당 (ListeningMind.AI 는 .rpt-main 내부 스크롤). */
+.view-dash, .view-a4 { min-height: 100vh; }
+
+/* ===== A4 page sizing (no JS paginate) =====
+   ListeningMind.AI 는 useA4Paginate 가 런타임에 .rpt-page 를 복제해 콘텐츠를 페이지
+   단위로 옮긴다. 단독 HTML 환경에선 그 훅이 없으므로 render_report.py 가
+   페르소나 카드마다 새 .rpt-page 를 emit 한다 (components.py:a4_body_page_html).
+   그래도 한 카드가 1013px 를 넘는 극단적 케이스에 대비해 본문 페이지의 고정
+   높이를 풀고 min-height 만 유지한다. cover 페이지는 1123px 고정. */
+.view-a4 .rpt-page:not(.rpt-page--cover) {
+  height: auto;
+  min-height: 1123px;
+}
+.view-a4 .page-body > * { break-inside: avoid; page-break-inside: avoid; }
+
+/* ===== View Toggle ===== */
+body.view-mode-dash .view-a4   { display: none; }
+body.view-mode-a4   .view-dash { display: none; }
+
+/* ===== Mini Toolbar (스킬 전용 - 화면에서만 보임) ===== */
+.mini-toolbar {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 6px 8px;
+  background: var(--white);
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-family);
+}
+
+.mini-toolbar__view {
+  display: flex;
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.mini-toolbar__view button {
+  border: none;
+  background: var(--white);
+  padding: 5px 12px;
+  font-size: var(--font-size-b4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-600);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mini-toolbar__view button.active {
+  background: var(--gray-800);
+  color: var(--white);
+}
+
+.mini-toolbar__view button:not(.active):hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.mini-toolbar__print {
+  border: var(--border-thin) solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  padding: 5px 12px;
+  font-size: var(--font-size-b4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-700);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.mini-toolbar__print:hover { background: var(--gray-100); }
+
+/* ===== Print Override =====
+   인쇄는 어떤 모드에 있건 A4 만 출력.
+   ListeningMind.AI 의 report-shell.css @media print 가 .view-dash 를 숨기지만
+   .view-mode-a4 일 때 .view-dash 는 이미 display:none, .view-mode-dash 일 때는
+   .view-a4 가 display:none 인 상태를 뒤집어야 한다. */
+@media print {
+  .mini-toolbar { display: none !important; }
+  body.view-mode-dash .view-dash,
+  body.view-mode-a4   .view-dash { display: none !important; }
+  body.view-mode-dash .view-a4,
+  body.view-mode-a4   .view-a4 { display: block !important; }
+
+  /* 인쇄 시에도 데스크톱 그리드 유지. 일부 브라우저는 인쇄 미리보기에서
+     뷰포트를 화면 폭으로 잡아 max-width:767px 모바일 규칙이 발동한다. */
+  .ticker-list { grid-template-columns: repeat(2, 1fr) !important; }
+  .ticker-row { flex-wrap: nowrap !important; }
+  .ticker-kw  { flex: 1 1 auto !important; font-size: var(--font-size-b3) !important; }
+  .ticker-vol { margin-left: 10px !important; }
+  .change-grid { grid-template-columns: 1fr 1fr !important; }
+  .ctx-grid    { grid-template-columns: repeat(3, 1fr) !important; }
+  .type-grid   { grid-template-columns: repeat(2, 1fr) !important; }
+  .action-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .br-card-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .persona-fields { grid-template-columns: repeat(3, 1fr) !important; }
+  .cmp-table   { min-width: auto !important; font-size: var(--font-size-b3) !important; }
+}
+
+/* ===== Force desktop layout in narrow viewports =====
+   ListeningMind.AI 의 모바일 미디어쿼리(@media max-width:767px)는 사이드바·툴바·
+   2열 그리드를 1열로 떨어뜨린다. Claude Desktop 의 내장 HTML 미리뷰는
+   뷰포트가 좁은 경우가 많아 그 규칙이 의도치 않게 작동한다. 우리 스킬은
+   "maistro 와 동일한 데스크톱 레이아웃" 을 목표로 하므로 좁은 뷰포트에서도
+   2열 그리드와 트렌드 ticker 2열을 유지하도록 강제한다. */
+@media (max-width: 767px) {
+  .ticker-list { grid-template-columns: repeat(2, 1fr) !important; }
+  .ticker-row { flex-wrap: nowrap !important; }
+  .ticker-kw  { flex: 1 1 auto !important; font-size: var(--font-size-b3) !important; }
+  .ticker-vol { margin-left: 10px !important; }
+  .change-grid { grid-template-columns: 1fr 1fr !important; }
+  .ctx-grid    { grid-template-columns: repeat(3, 1fr) !important; }
+  .type-grid   { grid-template-columns: repeat(2, 1fr) !important; }
+  .action-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .br-card-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .persona-fields { grid-template-columns: repeat(3, 1fr) !important; }
+  .cmp-table   { min-width: auto !important; font-size: var(--font-size-b3) !important; }
+}
+
+
+/* === locale font override === */
+html { --font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, Sans-serif; }</style>
+</head>
+<body class="view-mode-dash">
+
+  <div class="view-dash">
+    <div class="dash-scroll">
+      <div class="dash-cover-block"><div class="dash-card"><div class="dash-cover-gradient"><div class="dash-cover-eyebrow">クエリ機会分析 · 日本</div><div class="dash-cover-title">クエリ機会分析</div><div class="dash-cover-category">サプリメント</div><div class="dash-cover-meta">収集: 2026-09-14 · 検索目的 5 · ブランド・ノンブランド 5</div></div><div class="mr-summary-box mr-summary-box--dash"><div class="mr-summary-box__title">背景と目的</div><p class="mr-summary-text">本レポートは「サプリメント」と一緒に検索される関連クエリを検索意図ごとにまとめ、日本 (Google)の市場にどのような検索目的とブランド需要があるかを把握するために作成しました。ListeningMindの検索データで一緒に検索される関連クエリを収集し、検索ボリュームに基づいて検索目的グループと根拠キーワードを導き出しています。</p><p class="mr-summary-text mr-overview">サプリメントの検索は、成分名を指名して調べる情報探索と、ランキングやおすすめで選び直す比較検討が二層で重なっている。さらに疲れ・むくみ・肌・睡眠といった日常の不調や、ダイエットの成果を求める目的検索が広がり、ブランド名よりも成分と悩みが入り口になっている。</p></div></div></div>
+      <nav class="dash-tabs" aria-label="tabs"><div class="dash-tabs__inner" role="tablist"><button type="button" class="dash-tab active" role="tab" id="dash-tab-0" aria-selected="true" data-panel="0">検索目的</button><button type="button" class="dash-tab" role="tab" id="dash-tab-1" aria-selected="false" data-panel="1">インサイト・実行</button></div></nav>
+      <div class="dash-tab-panel active" role="tabpanel" aria-labelledby="dash-tab-0" data-panel="0"><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">「サプリメント」の検索目的</span><span class="dash-card__badge">5件</span></div><div class="dash-card__body"><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">01</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">成分を指名して調べる情報探索</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 655,597 · キーワード 30件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリメント</span><span class="volbadge-tip__vol">79,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マグネシウム サプリメント</span><span class="volbadge-tip__vol">56,833</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンc サプリ</span><span class="volbadge-tip__vol">46,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">nmn サプリメント</span><span class="volbadge-tip__vol">43,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">葉酸 サプリ</span><span class="volbadge-tip__vol">35,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エクオール サプリメント</span><span class="volbadge-tip__vol">33,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カリウム サプリ</span><span class="volbadge-tip__vol">33,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">鉄分 サプリメント</span><span class="volbadge-tip__vol">33,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">クレアチン サプリメント</span><span class="volbadge-tip__vol">29,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンd サプリメント</span><span class="volbadge-tip__vol">29,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルタチオン サプリメント</span><span class="volbadge-tip__vol">25,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">アスタキサンチン サプリ</span><span class="volbadge-tip__vol">18,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンb12 サプリメント</span><span class="volbadge-tip__vol">17,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ルテイン サプリメント</span><span class="volbadge-tip__vol">14,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マルチビタミン サプリメント</span><span class="volbadge-tip__vol">14,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カルシウム サプリメント</span><span class="volbadge-tip__vol">14,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">コラーゲンペプチド サプリメント</span><span class="volbadge-tip__vol">14,300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">食物繊維 サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dha epaサプリ</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">タンパク質 サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">アミノ酸 サプリメント</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">オメガ3 サプリメント</span><span class="volbadge-tip__vol">10,033</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">乳酸菌 サプリメント</span><span class="volbadge-tip__vol">9,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビオチン サプリメント</span><span class="volbadge-tip__vol">9,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">gaba サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">プラセンタ サプリメント</span><span class="volbadge-tip__vol">6,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ミネラル サプリメント</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンb群 サプリメント</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">トリプトファン サプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">イソフラボン サプリメント</span><span class="volbadge-tip__vol">3,600</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>情報探索型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">不足していそうな栄養素や、SNS・記事で見聞きした成分名をそのまま入力し、それが自分に必要かどうかを確かめようとしている層。製品よりも先に成分そのものを調べる姿勢が強い。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">自分に必要な成分かどうか</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 栄養素</span><span class="persona-kbf__kw">サプリメントの種類</span><span class="persona-kbf__kw">1日に必要な栄養素サプリメント おすすめ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">成分の組み合わせ方</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント組み合わせ最強</span><span class="persona-kbf__kw">マカ 亜鉛 サプリメント</span><span class="persona-kbf__kw">鉄亜鉛サプリ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">成分の質・由来</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">無添加 サプリメント</span><span class="persona-kbf__kw">天然 サプリメント</span><span class="persona-kbf__kw">オーガニック サプリメント</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">カテゴリ名ではなく成分名が入り口になっているため、成分ごとの解説ページを独立した受け皿として持つことが接点づくりの前提になる。自社製品の配合成分を軸に、成分理解から製品選択へ橋渡しする導線が有効。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">亜鉛サプリメント<span class="persona-ev__vol">79,500</span></span><span class="persona-ev__item">マグネシウム サプリメント<span class="persona-ev__vol">56,833</span></span><span class="persona-ev__item">ビタミンc サプリ<span class="persona-ev__vol">46,500</span></span><span class="persona-ev__item">nmn サプリメント<span class="persona-ev__vol">43,500</span></span><span class="persona-ev__item">葉酸 サプリ<span class="persona-ev__vol">35,566</span></span><span class="persona-ev__item">エクオール サプリメント<span class="persona-ev__vol">33,566</span></span><span class="persona-ev__item">カリウム サプリ<span class="persona-ev__vol">33,100</span></span><span class="persona-ev__item">鉄分 サプリメント<span class="persona-ev__vol">33,100</span></span><span class="persona-ev__item persona-ev__more">ほか 22件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">02</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">ランキング・おすすめで選び直す比較検討</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 289,805 · キーワード 27件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ランキング</span><span class="volbadge-tip__vol">35,233</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">人気 サプリメント ランキング</span><span class="volbadge-tip__vol">34,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 人気ランキング</span><span class="volbadge-tip__vol">34,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントおすすめ</span><span class="volbadge-tip__vol">31,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリメントおすすめ</span><span class="volbadge-tip__vol">13,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">人気 サプリメント</span><span class="volbadge-tip__vol">13,433</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">日本で一番売れてるサプリメント</span><span class="volbadge-tip__vol">12,530</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 通販</span><span class="volbadge-tip__vol">10,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">60代 サプリメント ランキング</span><span class="volbadge-tip__vol">8,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンcサプリメント おすすめ</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの種類</span><span class="volbadge-tip__vol">7,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">高齢者 サプリメントおすすめ</span><span class="volbadge-tip__vol">7,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 選び方</span><span class="volbadge-tip__vol">7,740</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">葉酸 サプリ おすすめ</span><span class="volbadge-tip__vol">6,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マグネシウム サプリメント おすすめ</span><span class="volbadge-tip__vol">6,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">鉄分 サプリメント おすすめ</span><span class="volbadge-tip__vol">6,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント専門店</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリメントおすすめ</span><span class="volbadge-tip__vol">5,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 購入</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">60代女性サプリメント ランキング</span><span class="volbadge-tip__vol">4,073</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養サプリメントおすすめ</span><span class="volbadge-tip__vol">4,066</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">50代女性 サプリメント ランキング</span><span class="volbadge-tip__vol">3,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エクオール サプリ ランキング</span><span class="volbadge-tip__vol">3,633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">睡眠 サプリメント おすすめ</span><span class="volbadge-tip__vol">3,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 安く買う</span><span class="volbadge-tip__vol">3,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ルテイン サプリメントおすすめ</span><span class="volbadge-tip__vol">2,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エクオール サプリメント おすすめ</span><span class="volbadge-tip__vol">2,733</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>比較型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">選択肢が多すぎて自力で絞れず、第三者の序列や売れ筋を判断のよりどころにしたい層。年代や性別を添えて、自分の条件に合う並び順を探している。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">第三者評価と売れ筋</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント ランキング</span><span class="persona-kbf__kw">日本で一番売れてるサプリメント</span><span class="persona-kbf__kw">人気 サプリメント</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">年代・性別への適合</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">60代 サプリメント ランキング</span><span class="persona-kbf__kw">50代女性 サプリメント ランキング</span><span class="persona-kbf__kw">女性用 サプリメント</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">入手経路と価格</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 通販</span><span class="persona-kbf__kw">サプリメント 安く買う</span><span class="persona-kbf__kw">サプリメント専門店</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">指名検索より先に第三者評価の面で比較されるため、比較コンテンツ側での露出と、年代・性別・目的別の絞り込み軸を用意することが選ばれる条件になる。自社サイトでも選び方の基準を明示した比較導線が必要。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメント ランキング<span class="persona-ev__vol">35,233</span></span><span class="persona-ev__item">人気 サプリメント ランキング<span class="persona-ev__vol">34,466</span></span><span class="persona-ev__item">サプリメント 人気ランキング<span class="persona-ev__vol">34,466</span></span><span class="persona-ev__item">サプリメントおすすめ<span class="persona-ev__vol">31,566</span></span><span class="persona-ev__item">亜鉛サプリメントおすすめ<span class="persona-ev__vol">13,900</span></span><span class="persona-ev__item">人気 サプリメント<span class="persona-ev__vol">13,433</span></span><span class="persona-ev__item">日本で一番売れてるサプリメント<span class="persona-ev__vol">12,530</span></span><span class="persona-ev__item">サプリメント 通販<span class="persona-ev__vol">10,400</span></span><span class="persona-ev__item persona-ev__more">ほか 19件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">03</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">不調・悩み別の解決策探し</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 193,793 · キーワード 33件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">腸活サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">疲労回復 サプリメント</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">むくみ サプリ</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">睡眠の サプリ</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">自律神経を整える サプリメント</span><span class="volbadge-tip__vol">9,300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">足がつるサプリ</span><span class="volbadge-tip__vol">8,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">更年期 サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">目のサプリメント</span><span class="volbadge-tip__vol">7,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">コレステロールを下げるサプリメント</span><span class="volbadge-tip__vol">7,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">貧血 サプリメント</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">脂肪肝 サプリメント</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">目にいい サプリメント</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">中性脂肪を下げるサプリメント</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">肌荒れ サプリメント</span><span class="volbadge-tip__vol">5,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">体臭 サプリ</span><span class="volbadge-tip__vol">5,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">むくみを取る サプリメント</span><span class="volbadge-tip__vol">4,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">肝臓に良い サプリメント</span><span class="volbadge-tip__vol">4,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">疲れが取れないサプリメント</span><span class="volbadge-tip__vol">4,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ニキビ サプリ</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">血糖値下げるサプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">腎臓に良いサプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">免疫力を高める サプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">脳疲労 サプリメント</span><span class="volbadge-tip__vol">3,966</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">白髪サプリメント</span><span class="volbadge-tip__vol">3,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">髪にいいサプリメント</span><span class="volbadge-tip__vol">3,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">骨粗鬆症サプリメント</span><span class="volbadge-tip__vol">3,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">シミに効く サプリメント</span><span class="volbadge-tip__vol">3,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">疲れを取るサプリメント</span><span class="volbadge-tip__vol">3,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">膝痛 サプリメント</span><span class="volbadge-tip__vol">3,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美肌サプリメント</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ホルモンバランスを整えるサプリメント</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">記憶力 サプリ</span><span class="volbadge-tip__vol">2,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">腸内環境を整えるサプリメント</span><span class="volbadge-tip__vol">2,733</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>問題解決型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">商品を探しているというより、いま抱えている不調の解決手段としてサプリにたどり着いた層。症状や検査値を言葉にして入力し、それに効く成分を逆引きしている。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">症状への直接的な手応え</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">疲れが取れないサプリメント</span><span class="persona-kbf__kw">むくみを取る サプリメント</span><span class="persona-kbf__kw">足がつるサプリ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">検査値・健康指標の改善</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">血糖値下げるサプリメント</span><span class="persona-kbf__kw">コレステロールを下げるサプリメント</span><span class="persona-kbf__kw">中性脂肪を下げるサプリメント</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">見た目・加齢の悩み</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">シミに効く サプリメント</span><span class="persona-kbf__kw">白髪サプリメント</span><span class="persona-kbf__kw">髪にいいサプリメント</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">悩みの言葉と成分名が結びついていないため、症状起点で成分と製品へ導く逆引きの受け皿が空いている。医薬品的な断定を避けつつ、悩み別のガイドを整備することが差別化になる。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">腸活サプリメント<span class="persona-ev__vol">13,000</span></span><span class="persona-ev__item">疲労回復 サプリメント<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">むくみ サプリ<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">睡眠の サプリ<span class="persona-ev__vol">11,366</span></span><span class="persona-ev__item">自律神経を整える サプリメント<span class="persona-ev__vol">9,300</span></span><span class="persona-ev__item">足がつるサプリ<span class="persona-ev__vol">8,700</span></span><span class="persona-ev__item">更年期 サプリメント<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">目のサプリメント<span class="persona-ev__vol">7,600</span></span><span class="persona-ev__item persona-ev__more">ほか 25件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">04</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">ダイエット・ボディメイクの成果追求</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 178,394 · キーワード 20件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット サプリメント</span><span class="volbadge-tip__vol">40,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">クレアチン サプリメント</span><span class="volbadge-tip__vol">29,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">痩せる サプリメント</span><span class="volbadge-tip__vol">15,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">テストステロン サプリメント</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット おすすめ サプリメント</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">脂肪燃焼 サプリメント</span><span class="volbadge-tip__vol">9,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">内臓脂肪を減らす サプリメント</span><span class="volbadge-tip__vol">7,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">筋トレ サプリメント</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">身長を伸ばす サプリメント</span><span class="volbadge-tip__vol">5,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">アルギニン サプリ</span><span class="volbadge-tip__vol">4,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">バストアップ サプリ</span><span class="volbadge-tip__vol">4,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">シトルリン サプリメント</span><span class="volbadge-tip__vol">4,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">お腹の脂肪を落とす サプリメント</span><span class="volbadge-tip__vol">3,966</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">韓国 ダイエットサプリ</span><span class="volbadge-tip__vol">3,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">皮下 脂肪 落とす サプリ</span><span class="volbadge-tip__vol">3,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カルニチン サプリ</span><span class="volbadge-tip__vol">3,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルタミン サプリメント</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット サプリメント 最強</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">内臓脂肪サプリメント</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">代謝を上げるサプリメント</span><span class="volbadge-tip__vol">2,566</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>購入意図型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">体型や体づくりの目標が先にあり、近道になりそうな一本を探している層。最強・韓国など、より強い結果を期待させる手がかりに反応しやすい。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">落としたい部位の明確さ</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">内臓脂肪を減らす サプリメント</span><span class="persona-kbf__kw">お腹の脂肪を落とす サプリメント</span><span class="persona-kbf__kw">皮下 脂肪 落とす サプリ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">強い効果への期待</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">ダイエット サプリメント 最強</span><span class="persona-kbf__kw">痩せる サプリメント</span><span class="persona-kbf__kw">韓国 ダイエットサプリ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">トレーニングとの併用</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">筋トレ サプリメント</span><span class="persona-kbf__kw">クレアチン サプリメント</span><span class="persona-kbf__kw">タンパク質 サプリメント</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">成果への期待が高い分、誇大な訴求に流れやすく離脱も早い。運動・食事との併用を前提に置いた現実的な期待値の提示と、継続前提の設計が信頼を確保する鍵になる。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">ダイエット サプリメント<span class="persona-ev__vol">40,500</span></span><span class="persona-ev__item">クレアチン サプリメント<span class="persona-ev__vol">29,933</span></span><span class="persona-ev__item">痩せる サプリメント<span class="persona-ev__vol">15,900</span></span><span class="persona-ev__item">テストステロン サプリメント<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">ダイエット おすすめ サプリメント<span class="persona-ev__vol">11,366</span></span><span class="persona-ev__item">脂肪燃焼 サプリメント<span class="persona-ev__vol">9,900</span></span><span class="persona-ev__item">内臓脂肪を減らす サプリメント<span class="persona-ev__vol">7,600</span></span><span class="persona-ev__item">筋トレ サプリメント<span class="persona-ev__vol">6,200</span></span><span class="persona-ev__item persona-ev__more">ほか 12件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">05</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">効果・飲み方・安全性の確認</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 89,868 · キーワード 19件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリメント効果</span><span class="volbadge-tip__vol">13,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲むタイミング</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 健康食品</span><span class="volbadge-tip__vol">7,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント組み合わせ最強</span><span class="volbadge-tip__vol">7,033</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マグネシウム サプリメント 効果</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛 サプリメント 飲む タイミング</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">nmn サプリ 効果</span><span class="volbadge-tip__vol">5,066</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント マカ 効果</span><span class="volbadge-tip__vol">3,633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンc サプリ 効果</span><span class="volbadge-tip__vol">3,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医者 が飲む サプリメント</span><span class="volbadge-tip__vol">3,460</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛 サプリメント 副作用</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 亜鉛 副作用</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dha epa サプリメント 効果 なし</span><span class="volbadge-tip__vol">2,966</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">プラセンタ サプリ の効果</span><span class="volbadge-tip__vol">2,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エビデンス のある サプリメント</span><span class="volbadge-tip__vol">2,843</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 種類一覧</span><span class="volbadge-tip__vol">2,803</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント英語</span><span class="volbadge-tip__vol">2,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンc サプリメント いつ 飲む</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント一覧</span><span class="volbadge-tip__vol">2,466</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>情報探索型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">買う前後に「本当に効くのか」「いつ飲むのか」「害はないか」を確かめたい層。効果への期待と不信が同居し、専門家や根拠の有無を手がかりにしている。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">科学的根拠の有無</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">エビデンス のある サプリメント</span><span class="persona-kbf__kw">医者 が飲む サプリメント</span><span class="persona-kbf__kw">dha epa サプリメント 効果 なし</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">飲むタイミング・続け方</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 飲むタイミング</span><span class="persona-kbf__kw">ビタミンc サプリメント いつ 飲む</span><span class="persona-kbf__kw">亜鉛 サプリメント 飲む タイミング</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">副作用と併用リスク</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">亜鉛 サプリメント 副作用</span><span class="persona-kbf__kw">サプリメント 亜鉛 副作用</span><span class="persona-kbf__kw">サプリメント組み合わせ最強</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">効果訴求だけでは不信を埋められず、飲むタイミング・併用・副作用まで含めた説明が信頼の分かれ目になる。根拠と限界を率直に示す情報設計が、比較段階での指名につながる。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">亜鉛サプリメント効果<span class="persona-ev__vol">13,900</span></span><span class="persona-ev__item">サプリメント 飲むタイミング<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">サプリメント 健康食品<span class="persona-ev__vol">7,933</span></span><span class="persona-ev__item">サプリメント組み合わせ最強<span class="persona-ev__vol">7,033</span></span><span class="persona-ev__item">マグネシウム サプリメント 効果<span class="persona-ev__vol">5,800</span></span><span class="persona-ev__item">亜鉛 サプリメント 飲む タイミング<span class="persona-ev__vol">5,800</span></span><span class="persona-ev__item">nmn サプリ 効果<span class="persona-ev__vol">5,066</span></span><span class="persona-ev__item">サプリメント マカ 効果<span class="persona-ev__vol">3,633</span></span><span class="persona-ev__item persona-ev__more">ほか 11件</span></div></div></div></div></div><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">ブランド・ノンブランドの地形</span><span class="dash-card__badge">5件</span></div><p class="persona-section-desc">「サプリメント」と一緒に検索されるブランド・ノンブランドのグループです。</p><div class="dash-card__body"><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">01</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">成分カテゴリのノンブランド需要</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 495,230 · キーワード 15件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリメント</span><span class="volbadge-tip__vol">79,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マグネシウム サプリメント</span><span class="volbadge-tip__vol">56,833</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンc サプリ</span><span class="volbadge-tip__vol">46,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">nmn サプリメント</span><span class="volbadge-tip__vol">43,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">葉酸 サプリ</span><span class="volbadge-tip__vol">35,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エクオール サプリメント</span><span class="volbadge-tip__vol">33,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">鉄分 サプリメント</span><span class="volbadge-tip__vol">33,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カリウム サプリ</span><span class="volbadge-tip__vol">33,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">クレアチン サプリメント</span><span class="volbadge-tip__vol">29,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンd サプリメント</span><span class="volbadge-tip__vol">29,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルタチオン サプリメント</span><span class="volbadge-tip__vol">25,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ルテイン サプリメント</span><span class="volbadge-tip__vol">14,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">食物繊維 サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">コラーゲン サプリメント</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">乳酸菌 サプリメント</span><span class="volbadge-tip__vol">9,900</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ノンブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">ブランド不問で成分から入る層</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">メーカー名を伴わない成分名の検索が市場の入り口を占めており、ブランド選好が固まる前の段階が広く存在する。成分解説の面を押さえた側が最初の想起を取りやすい。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">亜鉛サプリメント<span class="persona-ev__vol">79,500</span></span><span class="persona-ev__item">マグネシウム サプリメント<span class="persona-ev__vol">56,833</span></span><span class="persona-ev__item">ビタミンc サプリ<span class="persona-ev__vol">46,500</span></span><span class="persona-ev__item">nmn サプリメント<span class="persona-ev__vol">43,500</span></span><span class="persona-ev__item">葉酸 サプリ<span class="persona-ev__vol">35,566</span></span><span class="persona-ev__item">エクオール サプリメント<span class="persona-ev__vol">33,566</span></span><span class="persona-ev__item">鉄分 サプリメント<span class="persona-ev__vol">33,100</span></span><span class="persona-ev__item">カリウム サプリ<span class="persona-ev__vol">33,100</span></span><span class="persona-ev__item persona-ev__more">ほか 7件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">02</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">悩み・目的別のノンブランド需要</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 162,188 · キーワード 15件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット サプリメント</span><span class="volbadge-tip__vol">40,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">痩せる サプリメント</span><span class="volbadge-tip__vol">15,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">腸活サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">疲労回復 サプリメント</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">むくみ サプリ</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">睡眠の サプリ</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">自律神経を整える サプリメント</span><span class="volbadge-tip__vol">9,300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">更年期 サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美容 サプリメント</span><span class="volbadge-tip__vol">7,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">目のサプリメント</span><span class="volbadge-tip__vol">7,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">肌荒れ サプリメント</span><span class="volbadge-tip__vol">5,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">免疫力を高める サプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">高齢者 サプリメント</span><span class="volbadge-tip__vol">4,066</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">女性用 サプリメント</span><span class="volbadge-tip__vol">2,556</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ノンブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">解決したい状態から入る層</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">悩みや目的の言葉で検索する層はブランドも成分も未確定で、提案の余地がもっとも大きい。どの成分が効くのかを翻訳して見せる役割を担えば、指名検索への転換点になる。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">ダイエット サプリメント<span class="persona-ev__vol">40,500</span></span><span class="persona-ev__item">痩せる サプリメント<span class="persona-ev__vol">15,900</span></span><span class="persona-ev__item">腸活サプリメント<span class="persona-ev__vol">13,000</span></span><span class="persona-ev__item">疲労回復 サプリメント<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">むくみ サプリ<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">睡眠の サプリ<span class="persona-ev__vol">11,366</span></span><span class="persona-ev__item">自律神経を整える サプリメント<span class="persona-ev__vol">9,300</span></span><span class="persona-ev__item">更年期 サプリメント<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item persona-ev__more">ほか 7件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">03</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">DHC</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 139,796 · キーワード 10件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリメント</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント dhc</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhcサプリ</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリdhc</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 亜鉛 サプリ</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリ 亜鉛</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリメント 亜鉛</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリdhc</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 亜鉛 dhc</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛 サプリメント dhc</span><span class="volbadge-tip__vol">2,566</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">成分指名と結びつく定番ブランド</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">ブランド名単独だけでなく、亜鉛など具体的な成分と組み合わせて検索されており、成分を決めたあとの入手先として想起されている。低価格帯の定番という位置づけが検索の形に表れている。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">dhc サプリメント<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">サプリメント dhc<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">dhcサプリ<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">サプリdhc<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">dhc 亜鉛 サプリ<span class="persona-ev__vol">2,566</span></span><span class="persona-ev__item">dhc サプリ 亜鉛<span class="persona-ev__vol">2,566</span></span><span class="persona-ev__item">dhc サプリメント 亜鉛<span class="persona-ev__vol">2,566</span></span><span class="persona-ev__item">亜鉛サプリdhc<span class="persona-ev__vol">2,566</span></span><span class="persona-ev__item persona-ev__more">ほか 2件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">04</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">ファンケル</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 34,800 · キーワード 4件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル サプリメント</span><span class="volbadge-tip__vol">8,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ファンケル</span><span class="volbadge-tip__vol">8,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル サプリ</span><span class="volbadge-tip__vol">8,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ ファンケル</span><span class="volbadge-tip__vol">8,700</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">無添加・品質志向の指名ブランド</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">ブランド名そのものを確認する検索が中心で、無添加や品質を重視する層の受け皿になっている。成分検索との結びつきは弱く、ブランドへの信頼が先に立っている。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">ファンケル サプリメント<span class="persona-ev__vol">8,700</span></span><span class="persona-ev__item">サプリメント ファンケル<span class="persona-ev__vol">8,700</span></span><span class="persona-ev__item">ファンケル サプリ<span class="persona-ev__vol">8,700</span></span><span class="persona-ev__item">サプリ ファンケル<span class="persona-ev__vol">8,700</span></span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">05</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">サントリー</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 10,800 · キーワード 2件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー サプリメント</span><span class="volbadge-tip__vol">5,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー サプリ</span><span class="volbadge-tip__vol">5,400</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">大手メーカーの健康食品ライン</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">食品メーカーとしての信頼を背景に、健康維持目的の層から指名されている。個別成分よりも企業名が安心の担保として機能している。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">サントリー サプリメント<span class="persona-ev__vol">5,400</span></span><span class="persona-ev__item">サントリー サプリ<span class="persona-ev__vol">5,400</span></span></div></div></div></div></div></div>
+      <div class="dash-tab-panel" role="tabpanel" aria-labelledby="dash-tab-1" data-panel="1"><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">総合示唆</span></div><div class="dash-card__body"><p class="mr-summary-text">サプリメント市場の検索は、成分名で入る情報探索と、ランキングやおすすめで選び直す比較検討が二重構造になっている。悩み・目的から入る層はブランドも成分も決まっておらず、最初に翻訳して見せた側が想起を取れる空白地帯になっている。ブランド指名は一部の定番に集中しており、多くの検索はブランド名を伴わないまま比較の面へ流れている。</p></div></div><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">主要インサイト</span><span class="dash-card__badge">3件</span></div><div class="dash-card__body"><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>入り口は成分名、決め手は第三者評価</div><div class="rpt-act-card__body">成分名で調べ始めた人が、そのまま同じ成分のおすすめやランキングへ移っていく流れが検索の形に表れている。自社サイトだけで完結させず、比較の面に置かれる情報まで含めて設計する必要がある。</div></div><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>効果より先に不信を検証している</div><div class="rpt-act-card__body">効果、飲むタイミング、副作用、根拠の有無を確かめる検索が同じ成分の周辺に並んでいる。買う前に疑いを晴らす情報が足りておらず、そこを埋めた側が候補に残る。</div></div><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>悩みの言葉と成分名がつながっていない</div><div class="rpt-act-card__body">疲れ・むくみ・肌・検査値といった状態の言葉で探す層が広く、どの成分が対応するのかを自力で結びつけられていない。症状から成分への逆引き導線が用意されていない領域が残っている。</div></div></div></div></div><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">今すぐ試せること</span><span class="dash-card__badge">3件</span></div><div class="dash-card__body"><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>成分別ページを検索の入り口として整える</div><div class="rpt-act-card__body">自社製品の主要成分ごとに、役割・不足しやすい人・飲み方・注意点までを一枚で完結させたページを用意する。製品紹介の一部ではなく独立した受け皿として置く。</div></div><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>悩み起点の逆引きガイドを作る</div><div class="rpt-act-card__body">疲れ・むくみ・睡眠・肌・更年期など、実際に検索されている悩みの言葉を見出しにして、対応する成分と自社製品へ橋渡しする記事を整備する。医薬品的な断定は避け、期待できる範囲を明示する。</div></div><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>飲み方と副作用のQ&amp;Aを製品ページに併設する</div><div class="rpt-act-card__body">飲むタイミング、他のサプリとの組み合わせ、過剰摂取時の注意を製品ページ内で先回りして答える。比較段階で離脱する理由を潰す施策として優先度が高い。</div></div></div></div></div><div class="dash-card"><div class="dash-card__head"><span class="dash-card__title">今後注目すべき機会</span><span class="dash-card__badge">3件</span></div><div class="dash-card__body"><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>年代・性別で切り直した提案</div><div class="rpt-act-card__body">50代・60代や女性を条件に加えた比較検索が継続的に発生している。年代別の栄養課題を軸にしたセット提案やコンテンツは、指名を作る余地が大きい。</div></div><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>根拠提示を前面に出したブランディング</div><div class="rpt-act-card__body">エビデンスや専門家の選択を確かめる検索が上昇傾向にある。試験データや専門家監修を検索の入り口に置くことで、価格競争から距離を取れる。</div></div><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>腸内環境と新規成分の立ち上がり</div><div class="rpt-act-card__body">腸活や酪酸菌、NMNのような比較的新しい成分への関心が広がっている。教科書的な解説がまだ少ない領域を先に押さえることで、カテゴリの語り手になれる。</div></div></div></div></div></div>
+    </div>
+  </div>
+
+  <div class="view-a4">
+    <div class="a4-scroll">
+      <div class="rpt-page rpt-page--cover" id="page-0"><div class="cover-body"><div><div class="cover-lm">ListeningMind.AI</div><div class="cover-title">クエリ機会分析</div><div class="cover-category">サプリメント</div><div class="cover-meta"><span>2026-09-14</span><span class="cover-meta-sep">|</span><span>検索目的 5</span></div></div></div></div>
+      <div class="rpt-page" id="page-1"><div class="page-body"><div class="mr-summary-box"><div class="mr-summary-box__title">背景と目的</div><p class="mr-summary-text--sm">本レポートは「サプリメント」と一緒に検索される関連クエリを検索意図ごとにまとめ、日本 (Google)の市場にどのような検索目的とブランド需要があるかを把握するために作成しました。ListeningMindの検索データで一緒に検索される関連クエリを収集し、検索ボリュームに基づいて検索目的グループと根拠キーワードを導き出しています。</p><p class="mr-summary-text--sm mr-overview">サプリメントの検索は、成分名を指名して調べる情報探索と、ランキングやおすすめで選び直す比較検討が二層で重なっている。さらに疲れ・むくみ・肌・睡眠といった日常の不調や、ダイエットの成果を求める目的検索が広がり、ブランド名よりも成分と悩みが入り口になっている。</p></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">01</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">成分を指名して調べる情報探索</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 655,597 · キーワード 30件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリメント</span><span class="volbadge-tip__vol">79,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マグネシウム サプリメント</span><span class="volbadge-tip__vol">56,833</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンc サプリ</span><span class="volbadge-tip__vol">46,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">nmn サプリメント</span><span class="volbadge-tip__vol">43,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">葉酸 サプリ</span><span class="volbadge-tip__vol">35,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エクオール サプリメント</span><span class="volbadge-tip__vol">33,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カリウム サプリ</span><span class="volbadge-tip__vol">33,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">鉄分 サプリメント</span><span class="volbadge-tip__vol">33,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">クレアチン サプリメント</span><span class="volbadge-tip__vol">29,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンd サプリメント</span><span class="volbadge-tip__vol">29,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルタチオン サプリメント</span><span class="volbadge-tip__vol">25,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">アスタキサンチン サプリ</span><span class="volbadge-tip__vol">18,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンb12 サプリメント</span><span class="volbadge-tip__vol">17,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ルテイン サプリメント</span><span class="volbadge-tip__vol">14,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マルチビタミン サプリメント</span><span class="volbadge-tip__vol">14,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カルシウム サプリメント</span><span class="volbadge-tip__vol">14,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">コラーゲンペプチド サプリメント</span><span class="volbadge-tip__vol">14,300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">食物繊維 サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dha epaサプリ</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">タンパク質 サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">アミノ酸 サプリメント</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">オメガ3 サプリメント</span><span class="volbadge-tip__vol">10,033</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">乳酸菌 サプリメント</span><span class="volbadge-tip__vol">9,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビオチン サプリメント</span><span class="volbadge-tip__vol">9,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">gaba サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">プラセンタ サプリメント</span><span class="volbadge-tip__vol">6,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ミネラル サプリメント</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンb群 サプリメント</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">トリプトファン サプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">イソフラボン サプリメント</span><span class="volbadge-tip__vol">3,600</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>情報探索型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">不足していそうな栄養素や、SNS・記事で見聞きした成分名をそのまま入力し、それが自分に必要かどうかを確かめようとしている層。製品よりも先に成分そのものを調べる姿勢が強い。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">自分に必要な成分かどうか</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 栄養素</span><span class="persona-kbf__kw">サプリメントの種類</span><span class="persona-kbf__kw">1日に必要な栄養素サプリメント おすすめ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">成分の組み合わせ方</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント組み合わせ最強</span><span class="persona-kbf__kw">マカ 亜鉛 サプリメント</span><span class="persona-kbf__kw">鉄亜鉛サプリ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">成分の質・由来</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">無添加 サプリメント</span><span class="persona-kbf__kw">天然 サプリメント</span><span class="persona-kbf__kw">オーガニック サプリメント</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">カテゴリ名ではなく成分名が入り口になっているため、成分ごとの解説ページを独立した受け皿として持つことが接点づくりの前提になる。自社製品の配合成分を軸に、成分理解から製品選択へ橋渡しする導線が有効。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">亜鉛サプリメント<span class="persona-ev__vol">79,500</span></span><span class="persona-ev__item">マグネシウム サプリメント<span class="persona-ev__vol">56,833</span></span><span class="persona-ev__item">ビタミンc サプリ<span class="persona-ev__vol">46,500</span></span><span class="persona-ev__item">nmn サプリメント<span class="persona-ev__vol">43,500</span></span><span class="persona-ev__item">葉酸 サプリ<span class="persona-ev__vol">35,566</span></span><span class="persona-ev__item">エクオール サプリメント<span class="persona-ev__vol">33,566</span></span><span class="persona-ev__item">カリウム サプリ<span class="persona-ev__vol">33,100</span></span><span class="persona-ev__item">鉄分 サプリメント<span class="persona-ev__vol">33,100</span></span><span class="persona-ev__item persona-ev__more">ほか 22件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">02</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">成分カテゴリのノンブランド需要</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 495,230 · キーワード 15件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリメント</span><span class="volbadge-tip__vol">79,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マグネシウム サプリメント</span><span class="volbadge-tip__vol">56,833</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンc サプリ</span><span class="volbadge-tip__vol">46,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">nmn サプリメント</span><span class="volbadge-tip__vol">43,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">葉酸 サプリ</span><span class="volbadge-tip__vol">35,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エクオール サプリメント</span><span class="volbadge-tip__vol">33,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">鉄分 サプリメント</span><span class="volbadge-tip__vol">33,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カリウム サプリ</span><span class="volbadge-tip__vol">33,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">クレアチン サプリメント</span><span class="volbadge-tip__vol">29,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンd サプリメント</span><span class="volbadge-tip__vol">29,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルタチオン サプリメント</span><span class="volbadge-tip__vol">25,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ルテイン サプリメント</span><span class="volbadge-tip__vol">14,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">食物繊維 サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">コラーゲン サプリメント</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">乳酸菌 サプリメント</span><span class="volbadge-tip__vol">9,900</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ノンブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">ブランド不問で成分から入る層</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">メーカー名を伴わない成分名の検索が市場の入り口を占めており、ブランド選好が固まる前の段階が広く存在する。成分解説の面を押さえた側が最初の想起を取りやすい。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">亜鉛サプリメント<span class="persona-ev__vol">79,500</span></span><span class="persona-ev__item">マグネシウム サプリメント<span class="persona-ev__vol">56,833</span></span><span class="persona-ev__item">ビタミンc サプリ<span class="persona-ev__vol">46,500</span></span><span class="persona-ev__item">nmn サプリメント<span class="persona-ev__vol">43,500</span></span><span class="persona-ev__item">葉酸 サプリ<span class="persona-ev__vol">35,566</span></span><span class="persona-ev__item">エクオール サプリメント<span class="persona-ev__vol">33,566</span></span><span class="persona-ev__item">鉄分 サプリメント<span class="persona-ev__vol">33,100</span></span><span class="persona-ev__item">カリウム サプリ<span class="persona-ev__vol">33,100</span></span><span class="persona-ev__item persona-ev__more">ほか 7件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">03</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">ランキング・おすすめで選び直す比較検討</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 289,805 · キーワード 27件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ランキング</span><span class="volbadge-tip__vol">35,233</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">人気 サプリメント ランキング</span><span class="volbadge-tip__vol">34,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 人気ランキング</span><span class="volbadge-tip__vol">34,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントおすすめ</span><span class="volbadge-tip__vol">31,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリメントおすすめ</span><span class="volbadge-tip__vol">13,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">人気 サプリメント</span><span class="volbadge-tip__vol">13,433</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">日本で一番売れてるサプリメント</span><span class="volbadge-tip__vol">12,530</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 通販</span><span class="volbadge-tip__vol">10,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">60代 サプリメント ランキング</span><span class="volbadge-tip__vol">8,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンcサプリメント おすすめ</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメントの種類</span><span class="volbadge-tip__vol">7,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">高齢者 サプリメントおすすめ</span><span class="volbadge-tip__vol">7,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 選び方</span><span class="volbadge-tip__vol">7,740</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">葉酸 サプリ おすすめ</span><span class="volbadge-tip__vol">6,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マグネシウム サプリメント おすすめ</span><span class="volbadge-tip__vol">6,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">鉄分 サプリメント おすすめ</span><span class="volbadge-tip__vol">6,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント専門店</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミン サプリメントおすすめ</span><span class="volbadge-tip__vol">5,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 購入</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">60代女性サプリメント ランキング</span><span class="volbadge-tip__vol">4,073</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">栄養サプリメントおすすめ</span><span class="volbadge-tip__vol">4,066</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">50代女性 サプリメント ランキング</span><span class="volbadge-tip__vol">3,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エクオール サプリ ランキング</span><span class="volbadge-tip__vol">3,633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">睡眠 サプリメント おすすめ</span><span class="volbadge-tip__vol">3,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 安く買う</span><span class="volbadge-tip__vol">3,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ルテイン サプリメントおすすめ</span><span class="volbadge-tip__vol">2,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エクオール サプリメント おすすめ</span><span class="volbadge-tip__vol">2,733</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>比較型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">選択肢が多すぎて自力で絞れず、第三者の序列や売れ筋を判断のよりどころにしたい層。年代や性別を添えて、自分の条件に合う並び順を探している。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">第三者評価と売れ筋</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント ランキング</span><span class="persona-kbf__kw">日本で一番売れてるサプリメント</span><span class="persona-kbf__kw">人気 サプリメント</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">年代・性別への適合</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">60代 サプリメント ランキング</span><span class="persona-kbf__kw">50代女性 サプリメント ランキング</span><span class="persona-kbf__kw">女性用 サプリメント</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">入手経路と価格</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 通販</span><span class="persona-kbf__kw">サプリメント 安く買う</span><span class="persona-kbf__kw">サプリメント専門店</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">指名検索より先に第三者評価の面で比較されるため、比較コンテンツ側での露出と、年代・性別・目的別の絞り込み軸を用意することが選ばれる条件になる。自社サイトでも選び方の基準を明示した比較導線が必要。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">サプリメント ランキング<span class="persona-ev__vol">35,233</span></span><span class="persona-ev__item">人気 サプリメント ランキング<span class="persona-ev__vol">34,466</span></span><span class="persona-ev__item">サプリメント 人気ランキング<span class="persona-ev__vol">34,466</span></span><span class="persona-ev__item">サプリメントおすすめ<span class="persona-ev__vol">31,566</span></span><span class="persona-ev__item">亜鉛サプリメントおすすめ<span class="persona-ev__vol">13,900</span></span><span class="persona-ev__item">人気 サプリメント<span class="persona-ev__vol">13,433</span></span><span class="persona-ev__item">日本で一番売れてるサプリメント<span class="persona-ev__vol">12,530</span></span><span class="persona-ev__item">サプリメント 通販<span class="persona-ev__vol">10,400</span></span><span class="persona-ev__item persona-ev__more">ほか 19件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">04</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">不調・悩み別の解決策探し</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 193,793 · キーワード 33件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">腸活サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">疲労回復 サプリメント</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">むくみ サプリ</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">睡眠の サプリ</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">自律神経を整える サプリメント</span><span class="volbadge-tip__vol">9,300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">足がつるサプリ</span><span class="volbadge-tip__vol">8,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">更年期 サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">目のサプリメント</span><span class="volbadge-tip__vol">7,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">コレステロールを下げるサプリメント</span><span class="volbadge-tip__vol">7,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">貧血 サプリメント</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">脂肪肝 サプリメント</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">目にいい サプリメント</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">中性脂肪を下げるサプリメント</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">肌荒れ サプリメント</span><span class="volbadge-tip__vol">5,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">体臭 サプリ</span><span class="volbadge-tip__vol">5,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">むくみを取る サプリメント</span><span class="volbadge-tip__vol">4,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">肝臓に良い サプリメント</span><span class="volbadge-tip__vol">4,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">疲れが取れないサプリメント</span><span class="volbadge-tip__vol">4,466</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ニキビ サプリ</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">血糖値下げるサプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">腎臓に良いサプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">免疫力を高める サプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">脳疲労 サプリメント</span><span class="volbadge-tip__vol">3,966</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">白髪サプリメント</span><span class="volbadge-tip__vol">3,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">髪にいいサプリメント</span><span class="volbadge-tip__vol">3,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">骨粗鬆症サプリメント</span><span class="volbadge-tip__vol">3,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">シミに効く サプリメント</span><span class="volbadge-tip__vol">3,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">疲れを取るサプリメント</span><span class="volbadge-tip__vol">3,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">膝痛 サプリメント</span><span class="volbadge-tip__vol">3,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美肌サプリメント</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ホルモンバランスを整えるサプリメント</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">記憶力 サプリ</span><span class="volbadge-tip__vol">2,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">腸内環境を整えるサプリメント</span><span class="volbadge-tip__vol">2,733</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>問題解決型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">商品を探しているというより、いま抱えている不調の解決手段としてサプリにたどり着いた層。症状や検査値を言葉にして入力し、それに効く成分を逆引きしている。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">症状への直接的な手応え</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">疲れが取れないサプリメント</span><span class="persona-kbf__kw">むくみを取る サプリメント</span><span class="persona-kbf__kw">足がつるサプリ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">検査値・健康指標の改善</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">血糖値下げるサプリメント</span><span class="persona-kbf__kw">コレステロールを下げるサプリメント</span><span class="persona-kbf__kw">中性脂肪を下げるサプリメント</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">見た目・加齢の悩み</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">シミに効く サプリメント</span><span class="persona-kbf__kw">白髪サプリメント</span><span class="persona-kbf__kw">髪にいいサプリメント</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">悩みの言葉と成分名が結びついていないため、症状起点で成分と製品へ導く逆引きの受け皿が空いている。医薬品的な断定を避けつつ、悩み別のガイドを整備することが差別化になる。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">腸活サプリメント<span class="persona-ev__vol">13,000</span></span><span class="persona-ev__item">疲労回復 サプリメント<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">むくみ サプリ<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">睡眠の サプリ<span class="persona-ev__vol">11,366</span></span><span class="persona-ev__item">自律神経を整える サプリメント<span class="persona-ev__vol">9,300</span></span><span class="persona-ev__item">足がつるサプリ<span class="persona-ev__vol">8,700</span></span><span class="persona-ev__item">更年期 サプリメント<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">目のサプリメント<span class="persona-ev__vol">7,600</span></span><span class="persona-ev__item persona-ev__more">ほか 25件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">05</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">ダイエット・ボディメイクの成果追求</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 178,394 · キーワード 20件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット サプリメント</span><span class="volbadge-tip__vol">40,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">クレアチン サプリメント</span><span class="volbadge-tip__vol">29,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">痩せる サプリメント</span><span class="volbadge-tip__vol">15,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">テストステロン サプリメント</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット おすすめ サプリメント</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">脂肪燃焼 サプリメント</span><span class="volbadge-tip__vol">9,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">内臓脂肪を減らす サプリメント</span><span class="volbadge-tip__vol">7,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">筋トレ サプリメント</span><span class="volbadge-tip__vol">6,200</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">身長を伸ばす サプリメント</span><span class="volbadge-tip__vol">5,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">アルギニン サプリ</span><span class="volbadge-tip__vol">4,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">バストアップ サプリ</span><span class="volbadge-tip__vol">4,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">シトルリン サプリメント</span><span class="volbadge-tip__vol">4,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">お腹の脂肪を落とす サプリメント</span><span class="volbadge-tip__vol">3,966</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">韓国 ダイエットサプリ</span><span class="volbadge-tip__vol">3,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">皮下 脂肪 落とす サプリ</span><span class="volbadge-tip__vol">3,866</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">カルニチン サプリ</span><span class="volbadge-tip__vol">3,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">グルタミン サプリメント</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット サプリメント 最強</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">内臓脂肪サプリメント</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">代謝を上げるサプリメント</span><span class="volbadge-tip__vol">2,566</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>購入意図型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">体型や体づくりの目標が先にあり、近道になりそうな一本を探している層。最強・韓国など、より強い結果を期待させる手がかりに反応しやすい。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">落としたい部位の明確さ</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">内臓脂肪を減らす サプリメント</span><span class="persona-kbf__kw">お腹の脂肪を落とす サプリメント</span><span class="persona-kbf__kw">皮下 脂肪 落とす サプリ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">強い効果への期待</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">ダイエット サプリメント 最強</span><span class="persona-kbf__kw">痩せる サプリメント</span><span class="persona-kbf__kw">韓国 ダイエットサプリ</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">トレーニングとの併用</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">筋トレ サプリメント</span><span class="persona-kbf__kw">クレアチン サプリメント</span><span class="persona-kbf__kw">タンパク質 サプリメント</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">成果への期待が高い分、誇大な訴求に流れやすく離脱も早い。運動・食事との併用を前提に置いた現実的な期待値の提示と、継続前提の設計が信頼を確保する鍵になる。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">ダイエット サプリメント<span class="persona-ev__vol">40,500</span></span><span class="persona-ev__item">クレアチン サプリメント<span class="persona-ev__vol">29,933</span></span><span class="persona-ev__item">痩せる サプリメント<span class="persona-ev__vol">15,900</span></span><span class="persona-ev__item">テストステロン サプリメント<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">ダイエット おすすめ サプリメント<span class="persona-ev__vol">11,366</span></span><span class="persona-ev__item">脂肪燃焼 サプリメント<span class="persona-ev__vol">9,900</span></span><span class="persona-ev__item">内臓脂肪を減らす サプリメント<span class="persona-ev__vol">7,600</span></span><span class="persona-ev__item">筋トレ サプリメント<span class="persona-ev__vol">6,200</span></span><span class="persona-ev__item persona-ev__more">ほか 12件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">06</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">悩み・目的別のノンブランド需要</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 162,188 · キーワード 15件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ダイエット サプリメント</span><span class="volbadge-tip__vol">40,500</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">痩せる サプリメント</span><span class="volbadge-tip__vol">15,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">腸活サプリメント</span><span class="volbadge-tip__vol">13,000</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">疲労回復 サプリメント</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">むくみ サプリ</span><span class="volbadge-tip__vol">12,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">睡眠の サプリ</span><span class="volbadge-tip__vol">11,366</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">自律神経を整える サプリメント</span><span class="volbadge-tip__vol">9,300</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">更年期 サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">健康サプリメント</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">美容 サプリメント</span><span class="volbadge-tip__vol">7,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">目のサプリメント</span><span class="volbadge-tip__vol">7,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">肌荒れ サプリメント</span><span class="volbadge-tip__vol">5,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">免疫力を高める サプリメント</span><span class="volbadge-tip__vol">4,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">高齢者 サプリメント</span><span class="volbadge-tip__vol">4,066</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">女性用 サプリメント</span><span class="volbadge-tip__vol">2,556</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ノンブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">解決したい状態から入る層</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">悩みや目的の言葉で検索する層はブランドも成分も未確定で、提案の余地がもっとも大きい。どの成分が効くのかを翻訳して見せる役割を担えば、指名検索への転換点になる。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">ダイエット サプリメント<span class="persona-ev__vol">40,500</span></span><span class="persona-ev__item">痩せる サプリメント<span class="persona-ev__vol">15,900</span></span><span class="persona-ev__item">腸活サプリメント<span class="persona-ev__vol">13,000</span></span><span class="persona-ev__item">疲労回復 サプリメント<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">むくみ サプリ<span class="persona-ev__vol">12,100</span></span><span class="persona-ev__item">睡眠の サプリ<span class="persona-ev__vol">11,366</span></span><span class="persona-ev__item">自律神経を整える サプリメント<span class="persona-ev__vol">9,300</span></span><span class="persona-ev__item">更年期 サプリメント<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item persona-ev__more">ほか 7件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">07</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">DHC</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 139,796 · キーワード 10件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリメント</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント dhc</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhcサプリ</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリdhc</span><span class="volbadge-tip__vol">31,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc 亜鉛 サプリ</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリ 亜鉛</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dhc サプリメント 亜鉛</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリdhc</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 亜鉛 dhc</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛 サプリメント dhc</span><span class="volbadge-tip__vol">2,566</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">成分指名と結びつく定番ブランド</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">ブランド名単独だけでなく、亜鉛など具体的な成分と組み合わせて検索されており、成分を決めたあとの入手先として想起されている。低価格帯の定番という位置づけが検索の形に表れている。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">dhc サプリメント<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">サプリメント dhc<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">dhcサプリ<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">サプリdhc<span class="persona-ev__vol">31,100</span></span><span class="persona-ev__item">dhc 亜鉛 サプリ<span class="persona-ev__vol">2,566</span></span><span class="persona-ev__item">dhc サプリ 亜鉛<span class="persona-ev__vol">2,566</span></span><span class="persona-ev__item">dhc サプリメント 亜鉛<span class="persona-ev__vol">2,566</span></span><span class="persona-ev__item">亜鉛サプリdhc<span class="persona-ev__vol">2,566</span></span><span class="persona-ev__item persona-ev__more">ほか 2件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">08</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">効果・飲み方・安全性の確認</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 89,868 · キーワード 19件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛サプリメント効果</span><span class="volbadge-tip__vol">13,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 飲むタイミング</span><span class="volbadge-tip__vol">8,100</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 健康食品</span><span class="volbadge-tip__vol">7,933</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント組み合わせ最強</span><span class="volbadge-tip__vol">7,033</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">マグネシウム サプリメント 効果</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛 サプリメント 飲む タイミング</span><span class="volbadge-tip__vol">5,800</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">nmn サプリ 効果</span><span class="volbadge-tip__vol">5,066</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント マカ 効果</span><span class="volbadge-tip__vol">3,633</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンc サプリ 効果</span><span class="volbadge-tip__vol">3,600</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">医者 が飲む サプリメント</span><span class="volbadge-tip__vol">3,460</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">亜鉛 サプリメント 副作用</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 亜鉛 副作用</span><span class="volbadge-tip__vol">3,133</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">dha epa サプリメント 効果 なし</span><span class="volbadge-tip__vol">2,966</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">プラセンタ サプリ の効果</span><span class="volbadge-tip__vol">2,900</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">エビデンス のある サプリメント</span><span class="volbadge-tip__vol">2,843</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント 種類一覧</span><span class="volbadge-tip__vol">2,803</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント英語</span><span class="volbadge-tip__vol">2,733</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ビタミンc サプリメント いつ 飲む</span><span class="volbadge-tip__vol">2,566</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント一覧</span><span class="volbadge-tip__vol">2,466</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>情報探索型</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">買う前後に「本当に効くのか」「いつ飲むのか」「害はないか」を確かめたい層。効果への期待と不信が同居し、専門家や根拠の有無を手がかりにしている。</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"><div class="persona-kbf__row"><div class="persona-kbf__factor">科学的根拠の有無</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">エビデンス のある サプリメント</span><span class="persona-kbf__kw">医者 が飲む サプリメント</span><span class="persona-kbf__kw">dha epa サプリメント 効果 なし</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">飲むタイミング・続け方</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">サプリメント 飲むタイミング</span><span class="persona-kbf__kw">ビタミンc サプリメント いつ 飲む</span><span class="persona-kbf__kw">亜鉛 サプリメント 飲む タイミング</span></div></div><div class="persona-kbf__row"><div class="persona-kbf__factor">副作用と併用リスク</div><div class="persona-kbf__kws"><span class="persona-kbf__kw">亜鉛 サプリメント 副作用</span><span class="persona-kbf__kw">サプリメント 亜鉛 副作用</span><span class="persona-kbf__kw">サプリメント組み合わせ最強</span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">効果訴求だけでは不信を埋められず、飲むタイミング・併用・副作用まで含めた説明が信頼の分かれ目になる。根拠と限界を率直に示す情報設計が、比較段階での指名につながる。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">亜鉛サプリメント効果<span class="persona-ev__vol">13,900</span></span><span class="persona-ev__item">サプリメント 飲むタイミング<span class="persona-ev__vol">8,100</span></span><span class="persona-ev__item">サプリメント 健康食品<span class="persona-ev__vol">7,933</span></span><span class="persona-ev__item">サプリメント組み合わせ最強<span class="persona-ev__vol">7,033</span></span><span class="persona-ev__item">マグネシウム サプリメント 効果<span class="persona-ev__vol">5,800</span></span><span class="persona-ev__item">亜鉛 サプリメント 飲む タイミング<span class="persona-ev__vol">5,800</span></span><span class="persona-ev__item">nmn サプリ 効果<span class="persona-ev__vol">5,066</span></span><span class="persona-ev__item">サプリメント マカ 効果<span class="persona-ev__vol">3,633</span></span><span class="persona-ev__item persona-ev__more">ほか 11件</span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">09</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">ファンケル</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 34,800 · キーワード 4件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル サプリメント</span><span class="volbadge-tip__vol">8,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリメント ファンケル</span><span class="volbadge-tip__vol">8,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">ファンケル サプリ</span><span class="volbadge-tip__vol">8,700</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サプリ ファンケル</span><span class="volbadge-tip__vol">8,700</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">無添加・品質志向の指名ブランド</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">ブランド名そのものを確認する検索が中心で、無添加や品質を重視する層の受け皿になっている。成分検索との結びつきは弱く、ブランドへの信頼が先に立っている。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">ファンケル サプリメント<span class="persona-ev__vol">8,700</span></span><span class="persona-ev__item">サプリメント ファンケル<span class="persona-ev__vol">8,700</span></span><span class="persona-ev__item">ファンケル サプリ<span class="persona-ev__vol">8,700</span></span><span class="persona-ev__item">サプリ ファンケル<span class="persona-ev__vol">8,700</span></span></div></div></div><div class="dash-card persona-card"><div class="persona-card__head"><div class="persona-card__top"><span class="persona-card__num">10</span><div class="persona-card__topmain"><div class="persona-card__titlerow"><span class="persona-card__name">サントリー</span><span class="persona-subhead__badge persona-card__volbadge" tabindex="0" role="button" title="クリックでキーワード一覧を表示">月間検索ボリューム 10,800 · キーワード 2件<span class="volbadge-tip" role="tooltip"><span class="volbadge-tip__head"><span class="volbadge-tip__title">キーワード別の月間検索ボリューム</span><button type="button" class="volbadge-tip__close" aria-label="閉じる">&times;</button></span><span class="volbadge-tip__body"><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー サプリメント</span><span class="volbadge-tip__vol">5,400</span></span><span class="volbadge-tip__row"><span class="volbadge-tip__kw">サントリー サプリ</span><span class="volbadge-tip__vol">5,400</span></span></span></span></span></div><div class="persona-card__meta"><span>意図タイプ <b>ブランド</b></span></div></div></div></div><div class="persona-card__body"><div class="persona-subhead">このキーワードを検索する人たち<span class="persona-subhead__badge">検索データからの推論</span></div><div class="persona-who"><div class="persona-who__text">大手メーカーの健康食品ライン</div></div></div><div class="persona-card__body"><div class="persona-subhead">検索時に重視すること</div><div class="persona-kbf"></div></div><div class="persona-card__body"><div class="persona-subhead">総合結論</div><div class="persona-insight"><div class="persona-insight__label">インサイト</div><div class="persona-insight__text">食品メーカーとしての信頼を背景に、健康維持目的の層から指名されている。個別成分よりも企業名が安心の担保として機能している。</div></div><div class="persona-subhead">このグループを象徴するキーワード<span class="persona-ev-note">月間検索ボリューム基準</span></div><div class="persona-ev"><span class="persona-ev__item">サントリー サプリメント<span class="persona-ev__vol">5,400</span></span><span class="persona-ev__item">サントリー サプリ<span class="persona-ev__vol">5,400</span></span></div></div></div><div class="a4-prose">サプリメント市場の検索は、成分名で入る情報探索と、ランキングやおすすめで選び直す比較検討が二重構造になっている。悩み・目的から入る層はブランドも成分も決まっておらず、最初に翻訳して見せた側が想起を取れる空白地帯になっている。ブランド指名は一部の定番に集中しており、多くの検索はブランド名を伴わないまま比較の面へ流れている。</div><div class="persona-subhead">主要インサイト</div><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>入り口は成分名、決め手は第三者評価</div><div class="rpt-act-card__body">成分名で調べ始めた人が、そのまま同じ成分のおすすめやランキングへ移っていく流れが検索の形に表れている。自社サイトだけで完結させず、比較の面に置かれる情報まで含めて設計する必要がある。</div></div><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>効果より先に不信を検証している</div><div class="rpt-act-card__body">効果、飲むタイミング、副作用、根拠の有無を確かめる検索が同じ成分の周辺に並んでいる。買う前に疑いを晴らす情報が足りておらず、そこを埋めた側が候補に残る。</div></div><div class="rpt-act-card rpt-act-card--insight"><div class="rpt-act-card__title"><span class="action-dot action-dot--insight"></span>悩みの言葉と成分名がつながっていない</div><div class="rpt-act-card__body">疲れ・むくみ・肌・検査値といった状態の言葉で探す層が広く、どの成分が対応するのかを自力で結びつけられていない。症状から成分への逆引き導線が用意されていない領域が残っている。</div></div></div><div class="persona-subhead">今すぐ試せること</div><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>成分別ページを検索の入り口として整える</div><div class="rpt-act-card__body">自社製品の主要成分ごとに、役割・不足しやすい人・飲み方・注意点までを一枚で完結させたページを用意する。製品紹介の一部ではなく独立した受け皿として置く。</div></div><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>悩み起点の逆引きガイドを作る</div><div class="rpt-act-card__body">疲れ・むくみ・睡眠・肌・更年期など、実際に検索されている悩みの言葉を見出しにして、対応する成分と自社製品へ橋渡しする記事を整備する。医薬品的な断定は避け、期待できる範囲を明示する。</div></div><div class="rpt-act-card rpt-act-card--now"><div class="rpt-act-card__title"><span class="action-dot action-dot--now"></span>飲み方と副作用のQ&amp;Aを製品ページに併設する</div><div class="rpt-act-card__body">飲むタイミング、他のサプリとの組み合わせ、過剰摂取時の注意を製品ページ内で先回りして答える。比較段階で離脱する理由を潰す施策として優先度が高い。</div></div></div><div class="persona-subhead">今後注目すべき機会</div><div class="rpt-act-list"><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>年代・性別で切り直した提案</div><div class="rpt-act-card__body">50代・60代や女性を条件に加えた比較検索が継続的に発生している。年代別の栄養課題を軸にしたセット提案やコンテンツは、指名を作る余地が大きい。</div></div><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>根拠提示を前面に出したブランディング</div><div class="rpt-act-card__body">エビデンスや専門家の選択を確かめる検索が上昇傾向にある。試験データや専門家監修を検索の入り口に置くことで、価格競争から距離を取れる。</div></div><div class="rpt-act-card rpt-act-card--future"><div class="rpt-act-card__title"><span class="action-dot action-dot--future"></span>腸内環境と新規成分の立ち上がり</div><div class="rpt-act-card__body">腸活や酪酸菌、NMNのような比較的新しい成分への関心が広がっている。教科書的な解説がまだ少ない領域を先に押さえることで、カテゴリの語り手になれる。</div></div></div></div></div>
+    </div>
+  </div>
+
+  <script>
+(function(){
+  var tabs = document.querySelectorAll('.dash-tab');
+  var panels = document.querySelectorAll('.dash-tab-panel');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var idx = tab.getAttribute('data-panel');
+      tabs.forEach(function(t){
+        var on = t.getAttribute('data-panel') === idx;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      panels.forEach(function(p){
+        p.classList.toggle('active', p.getAttribute('data-panel') === idx);
+      });
+    });
+  });
+  var viewBtns = document.querySelectorAll('.mini-toolbar__view button');
+  viewBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mode = btn.getAttribute('data-view');
+      document.body.classList.toggle('view-mode-dash', mode === 'dash');
+      document.body.classList.toggle('view-mode-a4',   mode === 'a4');
+      viewBtns.forEach(function(b){ b.classList.toggle('active', b === btn); });
+    });
+  });
+
+  // 검색량 뱃지 — 클릭하면 키워드 목록(툴팁)을 토글. 마우스오버 시엔
+  // native title("클릭시 키워드 목록 확인")만 뜬다. X·바깥클릭으로 닫는다.
+  document.querySelectorAll('.persona-card__volbadge').forEach(function(badge){
+    var tip = badge.querySelector('.volbadge-tip');
+    var close = badge.querySelector('.volbadge-tip__close');
+    badge.addEventListener('click', function(e){
+      // 열린 목록 내부(행 등) 클릭은 유지 — 토글/전파 안 함
+      if (tip && tip.contains(e.target)) { e.stopPropagation(); return; }
+      e.stopPropagation();
+      badge.classList.toggle('tip-open');
+    });
+    // 키보드 접근성: Enter/Space 로도 토글
+    badge.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); badge.classList.toggle('tip-open');
+      }
+    });
+    if (close) {
+      close.addEventListener('click', function(e){
+        e.stopPropagation(); e.preventDefault();
+        badge.classList.remove('tip-open');
+      });
+    }
+  });
+  // 바깥 아무 곳이나 클릭하면 열린 목록 모두 닫기
+  document.addEventListener('click', function(){
+    document.querySelectorAll('.persona-card__volbadge.tip-open').forEach(function(b){
+      b.classList.remove('tip-open');
+    });
+  });
+})();
+</script>
+</body>
+</html>
